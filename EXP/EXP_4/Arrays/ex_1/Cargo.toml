@@ -1,0 +1,6 @@
+[package]
+name = "array_ex_1"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

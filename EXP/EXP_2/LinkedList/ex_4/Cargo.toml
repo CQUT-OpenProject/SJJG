@@ -1,0 +1,6 @@
+[package]
+name = "link_ex_4"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
