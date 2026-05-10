@@ -1,0 +1,38 @@
+[workspace]
+members = [
+    "EXP/EXP_1/ex_1",
+    "EXP/EXP_1/ex_2",
+    "EXP/EXP_1/ex_3",
+    "EXP/EXP_2/LinkedList/ex_2",
+    "EXP/EXP_2/LinkedList/ex_3",
+    "EXP/EXP_2/LinkedList/ex_4",
+    "EXP/EXP_2/LinkedList/ex_5",
+    "EXP/EXP_2/SequentialList/ex_1",
+    "EXP/EXP_2/SequentialList/ex_2",
+    "EXP/EXP_2/SequentialList/ex_3",
+    "EXP/EXP_3/Queues/ex_1",
+    "EXP/EXP_3/Queues/ex_2",
+    "EXP/EXP_3/Queues/ex_3",
+    "EXP/EXP_3/Stacks/ex_1",
+    "EXP/EXP_3/Stacks/ex_2",
+    "EXP/EXP_3/Stacks/ex_3",
+    "EXP/EXP_3/Stacks/ex_4",
+    "EXP/EXP_3/Stacks/ex_5",
+    "EXP/EXP_4/Arrays/ex_1",
+    "EXP/EXP_4/Arrays/ex_2",
+    "EXP/EXP_4/Arrays/ex_3",
+    "EXP/EXP_4/Strings/ex_1",
+    "EXP/EXP_4/Strings/ex_2",
+    "EXP/EXP_4/Strings/ex_3",
+    "EXP/EXP_4/Strings/ex_4",
+    "EXP/EXP_4/Strings/ex_5",
+    "EXP/EXP_5/ex_1",
+    "EXP/EXP_5/ex_2",
+    "EXP/EXP_5/ex_3",
+    "EXP/EXP_5/ex_4",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
