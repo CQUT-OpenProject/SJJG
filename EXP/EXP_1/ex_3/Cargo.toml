@@ -1,5 +1,5 @@
 [package]
-name = "exp1_ex_3"
+name = "exp_1_ex_3"
 version.workspace = true
 edition.workspace = true
 

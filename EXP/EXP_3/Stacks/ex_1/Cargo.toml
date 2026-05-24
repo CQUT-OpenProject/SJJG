@@ -1,6 +1,9 @@
 [package]
-name = "stack_ex_1"
+name = "exp_3_stacks_ex_1"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+
+[lib]
+name = "stack_ex_1"

@@ -76,7 +76,11 @@ pub fn simulate_hospital(commands: &[&str]) -> Vec<String> {
         if let Some(name) = cmd.strip_prefix("arrive ") {
             // arrive 命令表示有病人到达，直接进入等待队列。
             queue.enqueue(name);
-            result.push(format!("病人 {} 到达，当前等待: {:?}", name, queue.output()));
+            result.push(format!(
+                "病人 {} 到达，当前等待: {:?}",
+                name,
+                queue.output()
+            ));
         } else if *cmd == "next" {
             // next 命令表示护士叫下一位病人就诊，所以让队头出队。
             match queue.dequeue() {
@@ -84,7 +88,11 @@ pub fn simulate_hospital(commands: &[&str]) -> Vec<String> {
                 None => result.push("当前没有病人等待".to_string()),
             }
         } else if *cmd == "status" {
-            result.push(format!("剩余等待人数: {}，队列: {:?}", queue.len(), queue.output()));
+            result.push(format!(
+                "剩余等待人数: {}，队列: {:?}",
+                queue.len(),
+                queue.output()
+            ));
         }
     }
 

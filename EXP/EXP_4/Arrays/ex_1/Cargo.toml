@@ -1,6 +1,9 @@
 [package]
-name = "array_ex_1"
+name = "exp_4_arrays_ex_1"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
+
+[lib]
+name = "array_ex_1"

@@ -1,4 +1,4 @@
-use queue_ex_3::{simulate_hospital, PatientQueue};
+use queue_ex_3::{PatientQueue, simulate_hospital};
 
 #[test]
 fn patient_queue_keeps_fifo_order() {
@@ -16,7 +16,14 @@ fn patient_queue_keeps_fifo_order() {
 
 #[test]
 fn hospital_simulation_handles_arrival_and_next() {
-    let commands = ["arrive 张三", "arrive 李四", "next", "status", "next", "next"];
+    let commands = [
+        "arrive 张三",
+        "arrive 李四",
+        "next",
+        "status",
+        "next",
+        "next",
+    ];
     let result = simulate_hospital(&commands);
 
     assert_eq!(result[0], "病人 张三 到达，当前等待: [\"张三\"]");

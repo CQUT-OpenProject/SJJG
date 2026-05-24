@@ -80,8 +80,7 @@ impl BinaryTree {
                 if current.left.is_none() && current.right.is_none() {
                     1
                 } else {
-                    Self::count_leaves_node(&current.left)
-                        + Self::count_leaves_node(&current.right)
+                    Self::count_leaves_node(&current.left) + Self::count_leaves_node(&current.right)
                 }
             }
             None => 0,

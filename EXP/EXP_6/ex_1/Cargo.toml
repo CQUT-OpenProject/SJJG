@@ -1,0 +1,9 @@
+[package]
+name = "exp_6_ex_1"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+
+[lib]
+name = "ex_1"

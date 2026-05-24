@@ -30,6 +30,14 @@ members = [
     "EXP/EXP_5/ex_2",
     "EXP/EXP_5/ex_3",
     "EXP/EXP_5/ex_4",
+    "EXP/EXP_6/ex_1",
+    "EXP/EXP_6/ex_2",
+    "EXP/EXP_6/ex_3",
+    "EXP/EXP_6/ex_4",
+    "EXP/EXP_6/ex_5",
+    "EXP/EXP_6/ex_6",
+    "EXP/EXP_6/ex_7",
+    "EXP/EXP_6/ex_8",
 ]
 resolver = "2"
 

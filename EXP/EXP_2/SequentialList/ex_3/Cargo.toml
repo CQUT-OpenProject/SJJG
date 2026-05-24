@@ -1,6 +1,9 @@
 [package]
-name = "seq_ex_3"
+name = "exp_2_sequential_list_ex_3"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
+
+[lib]
+name = "seq_ex_3"

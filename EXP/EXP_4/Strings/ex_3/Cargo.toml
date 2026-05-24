@@ -1,6 +1,9 @@
 [package]
-name = "string_ex_3"
+name = "exp_4_strings_ex_3"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
+
+[lib]
+name = "string_ex_3"

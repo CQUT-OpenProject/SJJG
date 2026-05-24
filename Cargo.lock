@@ -3,121 +3,171 @@
 version = 4
 
 [[package]]
-name = "array_ex_1"
+name = "exp_1_ex_1"
 version = "0.1.0"
 
 [[package]]
-name = "array_ex_2"
+name = "exp_1_ex_2"
 version = "0.1.0"
 
 [[package]]
-name = "array_ex_3"
+name = "exp_1_ex_3"
 version = "0.1.0"
 
 [[package]]
-name = "exp1_ex_1"
+name = "exp_2_linked_list_ex_2"
 version = "0.1.0"
 
 [[package]]
-name = "exp1_ex_2"
+name = "exp_2_linked_list_ex_3"
 version = "0.1.0"
 
 [[package]]
-name = "exp1_ex_3"
+name = "exp_2_linked_list_ex_4"
 version = "0.1.0"
 
 [[package]]
-name = "exp3_ex_1"
+name = "exp_2_linked_list_ex_5"
 version = "0.1.0"
 
 [[package]]
-name = "exp3_ex_2"
+name = "exp_2_sequential_list_ex_1"
 version = "0.1.0"
 
 [[package]]
-name = "exp3_ex_3"
+name = "exp_2_sequential_list_ex_2"
 version = "0.1.0"
 
 [[package]]
-name = "exp3_ex_4"
+name = "exp_2_sequential_list_ex_3"
 version = "0.1.0"
 
 [[package]]
-name = "link_ex_2"
+name = "exp_3_queues_ex_1"
 version = "0.1.0"
 
 [[package]]
-name = "link_ex_3"
+name = "exp_3_queues_ex_2"
 version = "0.1.0"
 
 [[package]]
-name = "link_ex_4"
+name = "exp_3_queues_ex_3"
 version = "0.1.0"
 
 [[package]]
-name = "link_ex_5"
+name = "exp_3_stacks_ex_1"
 version = "0.1.0"
 
 [[package]]
-name = "queue_ex_1"
+name = "exp_3_stacks_ex_2"
 version = "0.1.0"
 
 [[package]]
-name = "queue_ex_2"
+name = "exp_3_stacks_ex_3"
 version = "0.1.0"
 
 [[package]]
-name = "queue_ex_3"
+name = "exp_3_stacks_ex_4"
 version = "0.1.0"
 
 [[package]]
-name = "seq_ex_1"
+name = "exp_3_stacks_ex_5"
 version = "0.1.0"
 
 [[package]]
-name = "seq_ex_2"
+name = "exp_4_arrays_ex_1"
 version = "0.1.0"
 
 [[package]]
-name = "seq_ex_3"
+name = "exp_4_arrays_ex_2"
 version = "0.1.0"
 
 [[package]]
-name = "stack_ex_1"
+name = "exp_4_arrays_ex_3"
 version = "0.1.0"
 
 [[package]]
-name = "stack_ex_2"
+name = "exp_4_strings_ex_1"
 version = "0.1.0"
 
 [[package]]
-name = "stack_ex_3"
+name = "exp_4_strings_ex_2"
 version = "0.1.0"
 
 [[package]]
-name = "stack_ex_4"
+name = "exp_4_strings_ex_3"
 version = "0.1.0"
 
 [[package]]
-name = "stack_ex_5"
+name = "exp_4_strings_ex_4"
 version = "0.1.0"
 
 [[package]]
-name = "string_ex_1"
+name = "exp_4_strings_ex_5"
 version = "0.1.0"
 
 [[package]]
-name = "string_ex_2"
+name = "exp_5_ex_1"
 version = "0.1.0"
 
 [[package]]
-name = "string_ex_3"
+name = "exp_5_ex_2"
 version = "0.1.0"
 
 [[package]]
-name = "string_ex_4"
+name = "exp_5_ex_3"
 version = "0.1.0"
 
 [[package]]
-name = "string_ex_5"
+name = "exp_5_ex_4"
 version = "0.1.0"
+
+[[package]]
+name = "exp_6_ex_1"
+version = "0.1.0"
+
+[[package]]
+name = "exp_6_ex_2"
+version = "0.1.0"
+
+[[package]]
+name = "exp_6_ex_3"
+version = "0.1.0"
+dependencies = [
+ "exp_6_ex_1",
+]
+
+[[package]]
+name = "exp_6_ex_4"
+version = "0.1.0"
+dependencies = [
+ "exp_6_ex_2",
+]
+
+[[package]]
+name = "exp_6_ex_5"
+version = "0.1.0"
+dependencies = [
+ "exp_6_ex_1",
+]
+
+[[package]]
+name = "exp_6_ex_6"
+version = "0.1.0"
+dependencies = [
+ "exp_6_ex_2",
+]
+
+[[package]]
+name = "exp_6_ex_7"
+version = "0.1.0"
+dependencies = [
+ "exp_6_ex_1",
+]
+
+[[package]]
+name = "exp_6_ex_8"
+version = "0.1.0"
+dependencies = [
+ "exp_6_ex_2",
+]

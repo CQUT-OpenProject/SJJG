@@ -1,4 +1,4 @@
-use stack_ex_1::{SeqStack, MAX};
+use stack_ex_1::{MAX, SeqStack};
 
 #[test]
 fn sequential_stack_supports_basic_operations() {

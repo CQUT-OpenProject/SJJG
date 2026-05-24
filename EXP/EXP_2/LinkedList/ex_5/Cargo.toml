@@ -1,6 +1,9 @@
 [package]
-name = "link_ex_5"
+name = "exp_2_linked_list_ex_5"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
+
+[lib]
+name = "link_ex_5"

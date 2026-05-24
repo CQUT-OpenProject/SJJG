@@ -1,6 +1,9 @@
 [package]
-name = "queue_ex_3"
+name = "exp_3_queues_ex_3"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+
+[lib]
+name = "queue_ex_3"

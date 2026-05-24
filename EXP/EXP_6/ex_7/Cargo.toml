@@ -1,0 +1,10 @@
+[package]
+name = "exp_6_ex_7"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+ex_1 = { package = "exp_6_ex_1", path = "../ex_1" }
+
+[lib]
+name = "ex_7"

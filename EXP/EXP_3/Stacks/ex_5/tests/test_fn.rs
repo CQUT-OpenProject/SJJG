@@ -2,11 +2,7 @@ use stack_ex_5::{brackets_match_link, brackets_match_seq};
 
 #[test]
 fn accepts_matching_braces() {
-    let cases = [
-        "fn main() { let a = { 3 + 5 }; }",
-        "{{}}{{}}",
-        "abc",
-    ];
+    let cases = ["fn main() { let a = { 3 + 5 }; }", "{{}}{{}}", "abc"];
 
     for text in cases {
         assert!(brackets_match_seq(text));
