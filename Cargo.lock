@@ -171,3 +171,23 @@ version = "0.1.0"
 dependencies = [
  "exp_6_ex_2",
 ]
+
+[[package]]
+name = "exp_7_ex_1"
+version = "0.1.0"
+
+[[package]]
+name = "exp_7_ex_2"
+version = "0.1.0"
+
+[[package]]
+name = "exp_7_ex_3"
+version = "0.1.0"
+
+[[package]]
+name = "exp_7_ex_4"
+version = "0.1.0"
+
+[[package]]
+name = "exp_7_ex_5"
+version = "0.1.0"
