@@ -1,0 +1,259 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[top=2.54cm,bottom=2.54cm,left=3.18cm,right=3.18cm]{geometry}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage[normalem]{ulem}
+\usepackage{setspace}
+\usepackage{indentfirst}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+
+\newcommand{\SongtiName}{Songti SC}
+\IfFontExistsTF{Songti SC}{%
+  \renewcommand{\SongtiName}{Songti SC}%
+}{%
+  \IfFontExistsTF{STSong}{%
+    \renewcommand{\SongtiName}{STSong}%
+  }{%
+    \IfFontExistsTF{SimSun}{%
+      \renewcommand{\SongtiName}{SimSun}%
+    }{%
+      \renewcommand{\SongtiName}{Noto Serif CJK SC}%
+    }%
+  }%
+}
+
+\setmainfont{\SongtiName}
+\IfFontExistsTF{Menlo}{%
+  \setmonofont{Menlo}[Scale=MatchLowercase]%
+}{%
+  \IfFontExistsTF{Monaco}{%
+    \setmonofont{Monaco}[Scale=MatchLowercase]%
+  }{%
+    \setmonofont{Latin Modern Mono}[Scale=MatchLowercase]%
+  }%
+}
+\setCJKmainfont[AutoFakeBold=2.2]{\SongtiName}
+\setCJKmonofont[AutoFakeBold=2.2]{\SongtiName}
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt
+\hypersetup{hidelinks}
+
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\renewcommand{\baselinestretch}{1.0}
+\pagestyle{plain}
+
+\newlength{\coverformwidth}
+\setlength{\coverformwidth}{10.8cm}
+\newlength{\coverlabelwidth}
+\newlength{\coverlabelcolwidth}
+
+\newcommand{\coverblank}[2]{%
+  \makebox[\textwidth][c]{%
+    {\fontsize{16pt}{24pt}\selectfont
+    \settowidth{\coverlabelwidth}{#1}%
+    #1\underline{\makebox[\dimexpr\coverformwidth-\coverlabelwidth\relax][c]{#2}}}%
+  }\par\vspace{0.42cm}%
+}
+\newcommand{\shortcoverblank}[3]{%
+  \makebox[\textwidth][c]{%
+    {\fontsize{16pt}{24pt}\selectfont
+    \settowidth{\coverlabelcolwidth}{院系名称}%
+    \makebox[\coverlabelcolwidth][l]{#1\hfill #2}%
+    \underline{\makebox[\dimexpr\coverformwidth-\coverlabelcolwidth\relax][c]{#3}}}%
+  }\par\vspace{0.42cm}%
+}
+\newcommand{\coverblankwide}[2]{%
+  \makebox[\textwidth][c]{%
+    {\fontsize{20pt}{28pt}\selectfont\bfseries
+    \settowidth{\coverlabelwidth}{#1}%
+    #1\underline{\makebox[\dimexpr\coverformwidth-\coverlabelwidth\relax][c]{#2}}}%
+  }\par\vspace{0.5cm}%
+}
+
+\newcommand{\studentidrow}{%
+  \makebox[\textwidth][c]{%
+    \makebox[\coverformwidth][l]{%
+      {\fontsize{16pt}{24pt}\selectfont
+      \settowidth{\coverlabelwidth}{学生姓名}%
+      \settowidth{\coverlabelcolwidth}{学号}%
+      学生姓名\underline{\makebox[\dimexpr\coverformwidth-\coverlabelwidth-\coverlabelcolwidth-3.15cm\relax][c]{}}%
+      学号\underline{\makebox[3.15cm][c]{}}}%
+    }%
+  }\par\vspace{0.42cm}%
+}
+\newcommand{\reporttitle}[1]{%
+  \begin{center}
+    {\fontsize{16pt}{22pt}\selectfont #1}
+  \end{center}
+}
+\newcommand{\reportsection}[1]{%
+  \vspace{0.35\baselineskip}
+  {\noindent\fontsize{12pt}{18pt}\selectfont\bfseries #1\par}
+  \vspace{0.2\baselineskip}
+}
+\newcommand{\labelpara}[1]{\noindent\textbf{#1}\par}
+\newcommand{\codeText}[1]{{\ttfamily #1}}
+\newcommand{\codeLine}[1]{\noindent\hspace*{2em}{\fontsize{9pt}{13pt}\selectfont\ttfamily #1}\par}
+\newcommand{\plainCode}[1]{\noindent{\fontsize{9pt}{13pt}\selectfont\ttfamily #1}\par}
+\newcommand{\tabcode}[1]{\noindent\hspace*{2em}#1\par}
+\newcommand{\tabtabcode}[1]{\noindent\hspace*{4em}#1\par}
+
+\begin{document}
+\fontsize{10.5pt}{15.6pt}\selectfont
+
+\begin{titlepage}
+\thispagestyle{empty}
+\centering
+\vspace*{1.0cm}
+\makebox[\textwidth][c]{%
+  \includegraphics[width=10.9cm]{images/cqut.png}%
+}
+
+\vspace{2.4cm}
+{\fontsize{36pt}{48pt}\selectfont 课\quad 程\quad 设\quad 计\par}
+
+\vspace{1.55cm}
+\coverblankwide{课程名}{程序设计实践III}
+
+\vspace{1.65cm}
+\coverblank{院系名称}{计算机科学与工程学院}
+\shortcoverblank{班}{级}{}
+\studentidrow
+\coverblank{指导教师}{}
+\coverblank{评阅教师}{}
+\shortcoverblank{时}{间}{}
+
+\vfill
+\end{titlepage}
+
+\reporttitle{课程设计报告格式}
+
+\reportsection{一、课程设计概述}
+本次数据结构课程设计共完成三个题目：成绩分析问题、教学计划编制问题、农夫过河问题。
+
+使用语言：C语言
+
+\noindent\hspace*{2em}编译环境：Microsoft Visual C++6.0
+
+\reportsection{二、课程设计题目一}
+\labelpara{【实验内容】}
+成绩分析问题。
+
+\labelpara{【问题描述】}
+设计并实现一个成绩分析系统，能够实现录入、保存一个班级学生多门课程的成绩、并对成绩进行分析等功能。
+
+\labelpara{【需求分析】}
+\noindent\hspace*{2em}经过分析，本系统需完成的主要功能如下：
+
+\noindent\hspace*{2em}1.通过键盘输入各学生的多门课程的成绩，建立相应的文件input.dat
+
+\tabcode{2.对文件input.dat中的数据进行处理，要求具有如下功能：}
+\tabtabcode{a.按各门课程成绩排序，并生成相应的文件输出}
+\tabtabcode{b.计算每人的平均成绩，按平均成绩排序，并生成文件}
+\tabtabcode{c.求出各门课程的平均成绩、最高分、最低分、不及格人数、}
+\tabtabcode{60－69分人数、70－79分人数、80－89分人数、90分以上人数}
+\tabtabcode{d.根据姓名或学号查询某人的各门课成绩，重名也要能处理}
+\tabcode{3.界面美观}
+
+\labelpara{【概要设计】}
+\plainCode{\{}
+\codeLine{Status CreateList(DataRecond* DR, int n); \qquad //创建成绩表}
+\codeLine{Status SortScore(DataRecond* DR,int n); \qquad //按各科成绩排序并存于文件}
+\codeLine{Status Partition(KeyWord* RL, int low, int high); \qquad //快速排序的第一趟}
+\codeLine{Status QSort(KeyWord* RL, int low, int high); \qquad //快速排序}
+\codeLine{Status QuickSort(KeyWord* RL,int n); \qquad //快速排序}
+\codeLine{Status EveryAvageScore(DataRecond* DR, int n); \qquad //计算每科平均成绩}
+\codeLine{Status CaluAverage(int *temp, int n); \qquad //计算平均成绩}
+\codeLine{Status ScoreProcess(DataRecond* DR); \qquad //成绩处理}
+\codeLine{Status MaxScore(int *temp, int n); \qquad //求最大分数}
+\codeLine{Status MinScore(int *temp, int n); \qquad //求最小分数}
+\codeLine{Status ScoreSegment(DataRecond* DR); \qquad //求分数段}
+\codeLine{Status Process(int *temp,int n); \qquad //主处理函数}
+\codeLine{Status NameQuery(DataRecond* DR); \qquad //按名字查找}
+\codeLine{Status NoQuery(DataRecond* DR); \qquad //按学号查找}
+\plainCode{\}}
+
+\labelpara{【存储结构】}
+\plainCode{typedef struct Recond\qquad //记录类型}
+\plainCode{\{}
+\codeLine{unsigned int No; \qquad //学号}
+\codeLine{char name[10]; \qquad //姓名}
+\codeLine{unsigned int Math; \qquad //数学成绩}
+\codeLine{unsigned int English; \qquad //英语成绩}
+\codeLine{unsigned int Computer; \qquad //计算机成绩}
+\plainCode{\}StuReco;}
+\plainCode{typedef struct DataRecond\qquad //成绩表类型}
+\plainCode{\{}
+\codeLine{StuReco *StuArray;}
+\codeLine{unsigned int size;}
+\plainCode{\}DataRecond;}
+\plainCode{typedef struct KeyWord \qquad //关键字类型}
+\plainCode{\{}
+\codeLine{int cord;}
+\codeLine{int score;}
+\plainCode{\}KeyWord;}
+
+\labelpara{【流程图】}
+\plainCode{int Partition(KeyWord* RL, int low, int high) \qquad //快速排序第一趟}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.22}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{0.65cm}|p{0.65cm}|p{7.9cm}|}
+\hline
+\multicolumn{3}{|c|}{用第一个记录做枢轴记录；}\\
+\hline
+\multicolumn{3}{|c|}{\codeText{while (low<high)}}\\
+\hline
+ & \multicolumn{2}{c|}{\codeText{while(low<high\&\& RL[high].score>=keypivot)}}\\
+\cline{2-3}
+ & & \codeText{--high;}\\
+\cline{2-3}
+ & \multicolumn{2}{l|}{高端记录下移；}\\
+\cline{2-3}
+ & \multicolumn{2}{c|}{\codeText{while (low<high \&\& RL[low].score<=keypivot)}}\\
+\cline{2-3}
+ & & \codeText{++low;}\\
+\cline{2-3}
+ & \multicolumn{2}{l|}{低端记录上移；}\\
+\hline
+\multicolumn{3}{|l|}{将枢轴放到适当位置}\\
+\hline
+\multicolumn{3}{|c|}{\codeText{return low;}}\\
+\hline
+\end{tabular}
+\end{center}
+
+\labelpara{【详细设计】}
+\noindent\hspace*{2em}源程序清单（重要程序段和其重要变量的说明）
+
+\labelpara{【调试分析】}
+本程序主要的操作对象是记录数组，使用的存储结构是结构体数组。另外还有对C语言中关于文件的操作，这是本程序中的一个重点也是难点，是此程序出现问题的主要原因之一：
+
+\labelpara{【问题一】}
+\noindent\textbf{现象：}输出的成绩不是正确的数字，而是一些类似于地址值的数字。
+
+\noindent\textbf{原因：}\uline{程序中对各数组的下标操作不统一。}因为程序要分别对三个科目的成绩进行统计，所以程序中就要有一个临时数组来存放成绩值，然而在将学科成绩存放在临时数组的过程中如果出现了下标不统一的情况，即在原记录数组中是1…n号元素存放数据,在临时数组中却是0…n-1号元素存放数据。就会引起程序的错误。解决的方法是将整个程序中相互有关的数组使用统一的下标存放数据，就可以避免这种问题。
+
+\labelpara{【问题二】}
+\noindent\textbf{现象：}这是一个关于文件操作的问题。在将记录存入文件以后再从文件中读取时就出现错误。
+
+\noindent\textbf{原因：}\uline{在使用fwrite和fread命令的时候函数的参数没有写正确。}fwrite和fread 命令的第一个参数是存储数据的首地址，如果没有地址没有正确，那么就不能正常地将数据存到文件中也不能正常地读取。
+
+\labelpara{【运行结果及分析】}
+\noindent\hspace*{2em}从屏幕上截图，说明运行结果，并分析是否正确，正确的原因
+
+\reportsection{三、参考文献}
+\noindent[1]《C程序设计》第二版，谭浩强著。北京：清华大学出版社，2004年。
+
+\noindent[2]《数据结构》，严蔚敏、吴伟民。北京：清华大学出版社，2005年。
+
+\end{document}

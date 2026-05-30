@@ -1,0 +1,128 @@
+\documentclass[a4paper]{article}
+
+\usepackage[top=2.54cm,bottom=2.54cm,left=3.18cm,right=3.18cm]{geometry}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\usepackage{setspace}
+\usepackage{indentfirst}
+\usepackage{enumitem}
+\usepackage{hyperref}
+
+\newcommand{\SongtiName}{Songti SC}
+\IfFontExistsTF{Songti SC}{%
+  \renewcommand{\SongtiName}{Songti SC}%
+}{%
+  \IfFontExistsTF{STSong}{%
+    \renewcommand{\SongtiName}{STSong}%
+  }{%
+    \IfFontExistsTF{SimSun}{%
+      \renewcommand{\SongtiName}{SimSun}%
+    }{%
+      \renewcommand{\SongtiName}{Noto Serif CJK SC}%
+    }%
+  }%
+}
+
+\setmainfont{Times New Roman}
+\setCJKmainfont[AutoFakeBold=2.2]{\SongtiName}
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt
+\hypersetup{hidelinks}
+
+\pagestyle{plain}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\setstretch{1.0}
+
+\newcommand{\exptitle}[1]{%
+  \vspace*{7.8pt}
+  \begin{center}
+    {\fontsize{18pt}{21.6pt}\selectfont #1\par}
+  \end{center}
+  \vspace{7.8pt}
+}
+
+\newcommand{\studentinfo}{%
+  \noindent 姓名：\underline{\makebox[2.65cm][c]{}}\quad
+  学号：\underline{\makebox[2.65cm][c]{}}\par
+  \vspace{7.8pt}
+}
+
+\newcommand{\reportsection}[1]{%
+  \vspace{7.8pt}
+  {\noindent\fontsize{14pt}{16.8pt}\selectfont #1\par}
+  \vspace{7.8pt}
+}
+
+\newcommand{\reportsectionbold}[1]{%
+  \vspace{7.8pt}
+  {\noindent\fontsize{14pt}{16.8pt}\selectfont\bfseries #1\par}
+  \vspace{7.8pt}
+}
+
+\newcommand{\normalpara}[1]{%
+  \noindent #1\par
+}
+
+\newcommand{\indentpara}[1]{%
+  \noindent\hspace*{2em}#1\par
+}
+
+\newlist{reportitems}{enumerate}{1}
+\setlist[reportitems]{%
+  label=\arabic*),
+  leftmargin=42pt,
+  labelwidth=21pt,
+  labelsep=0pt,
+  itemindent=0pt,
+  align=left,
+  topsep=0pt,
+  partopsep=0pt,
+  parsep=0pt,
+  itemsep=0pt
+}
+
+\begin{document}
+\fontsize{10.5pt}{15.6pt}\selectfont
+
+\exptitle{实验一 XXX}
+
+\studentinfo
+
+\reportsectionbold{【问题描述】}
+\indentpara{陈述本实验的任务，强调要解决的问题是什么？明确规定：输入的形式和输入值的范围；输出的形式；系统所能达到的功能；测试数据。}
+
+\reportsection{【基本思路】}
+\indentpara{写出存储结构，主要算法的基本思想（自然语言或类高级语言描述）。}
+\indentpara{每个操作及模块的伪码算法。列出每个过程或函数所调用关系，可以通过层次图表达。}
+
+\reportsection{【实验结果及分析】}
+\normalpara{1. 实验结果： 请描述实验过程，包括编程环境、测试数据等，用图、表等方式，呈现实验结果。}
+
+\indentpara{1.1 实验过程描述}
+
+\begin{reportitems}
+  \item 本实验用 XX 语言开发，编译环境为 XX，运行机器为本人笔记本电脑或 XXXX。由 X 人 设计方案，本人独立完成编码和测试。
+  \item 测试数据选取思路为：典型，XXX，XXX。累计选取 X 组数据进行测试。
+  \item XXX 部分的逻辑是测试重点。因为 XXX
+\end{reportitems}
+
+\noindent\hspace*{2em}1.2测试结果 用图、表等方式，呈现实验结果。\par
+
+\normalpara{2. 结果及方案分析}
+
+\indentpara{2.1本实验的重点及难点}
+\indentpara{本实验设计的重点为 XXXX。 本实验设计的难点为 XXXX。}
+
+\indentpara{2.2本实验设计的优点及可以改进的方向}
+\indentpara{实验完全或部分实现了预计功能。}
+\indentpara{设计得较为充分之处为 XX}
+\indentpara{设计的可优化处包括：XXXX}
+
+\normalpara{3. 还有哪些实现方法？谈谈你的个人观点。（思政目标）}
+\indentpara{}
+
+\normalpara{4. 附件：源程序代码}
+\indentpara{}
+
+\end{document}

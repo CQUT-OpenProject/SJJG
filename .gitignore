@@ -2,3 +2,20 @@
 target/
 *.docx
 AGENTS.md
+
+# LaTeX build intermediates
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+
+!CCP/report(template)/docx/《程序设计实践III》课程设计报告模板.docx
+!EXP/report(template)/docx/实验报告格式.docx
