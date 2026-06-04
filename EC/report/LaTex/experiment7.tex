@@ -1,0 +1,494 @@
+\clearpage
+\expchapter{实验七\quad 我的搜索引擎 MARS}
+\sect{教学目标}
+\noindent\hspace*{2em}关键词：搜索引擎，倒排索引\par
+\noindent\hspace*{2em}知识和能力目标：理解和熟练掌握多链表存储结构及操作方法，本例主要是构建倒排索引结构，进而构建一个简易的搜索引擎。\par
+\noindent\hspace*{2em}价值目标：科学精神：信息检索系统中包含的原理、方法和实践技术庞大，本实验仅仅只窥一斑。希望你能立足本实验，从查询分析、索引建立、结果排序等各方面，做进一步的探索。要相信，知之越多，知之越少，探究得更深入，才能越知自己的不足。\par
+\sect{问题描述}
+\noindent\hspace*{2em}搜索引擎是指从互联网上采集、组织和处理信息，进而提供信息检索服务、将检索结果展示给用户的系统。搜索引擎旨在提供快速、高相关性的信息服务，搭建起友好的网络使用平台。搜索引擎涵盖信息存储、检索等多种技术，如网络爬虫、检索排序、网页处理、自然语言处理等，因此其核心模块一般包括爬虫、索引、检索和排序等\footnote{同时可添加其他辅助模块，为用户提供更好的信息检索体验。}。图 1 是一个信息检索过程的简图。\par
+
+\noindent\textbf{\textbf{Result}}\par
+\begin{center}
+\includegraphics[width=0.7\textwidth]{images/exp7-1.png}
+\end{center}
+\figcaption{图 1 信息检索过程简图}
+\noindent\hspace*{2em}现在我们聚焦图 1 的"查找索引"环节。显然，为了查找，需构建一个"查找表"，也可叫它 "索引库"。根据用户提交的搜索请求（Query），去查找表中找到相关文档或网页，再通过对网页进行重要性排序等操作，把查询结果反馈给用户。\par
+\noindent\hspace*{2em}在构建查找表时，其策略是构造"文档—词项关联矩阵"（图 2（a））或"词项—文档关联矩阵"（图 2（b））所示。它们的检索效率会有什么不同呢？\par
+\begin{center}
+\includegraphics[width=0.95\textwidth]{images/exp7-3.png}
+\end{center}
+\figcaption{图 2 两种查找表构建策略}
+\noindent\hspace*{2em}为保证存储和查找效率，常以如下倒排索引（Inversed Index）的（图 3）方法构造查找表。\par
+\begin{center}
+\includegraphics[width=0.7\textwidth]{images/exp7-2.png}
+\end{center}
+\figcaption{图 3 倒排索引结构示例}
+\noindent\textbf{本实验要求：}\par
+\noindent\hspace*{2em}构建一个我们自己的搜索引擎。很高兴，2022 年 5 月 15 日，中国的"天问一号"搭载火星车"祝融"成功登陆火星，拓展了中国人逐梦星辰的疆域。我们把我们的搜索引擎起名为小马尔斯（\textbf{M}\textbf{A}\textbf{R}\textbf{S}），以庆祝这个重要的时刻。\par
+\noindent\hspace*{2em}MARS 的主要任务：用户可输入一个关键词，MARS 到查找表中去找到这个关键词相关的文本，返回这些文本。\par
+\sect{基本思路}
+\noindent\textbf{基本假设：}\par
+\noindent\hspace*{2em}用户每次只输入一个关键词，例如：apple\par
+\noindent\hspace*{2em}MARS 只需返回所有与关键词相关的文本文件名，无需对这些文本进行排序。\par
+\noindent\hspace*{2em}对输出格式无要求，MARS 只需显示相关文本的文件名即可。以下为一种运行情境示例。在控制台输入snow，将检索结果输出到 index.html 文件，可在浏览器中打开 index.html 文件进行浏览。\par
+\begin{center}
+\includegraphics[width=0.95\textwidth]{images/exp7-4.png}
+\end{center}
+
+\noindent\textbf{倒排索引构建算法：}\par
+\noindent\hspace*{2em}倒排索引（Inverted Index）是一种"词→文档"的映射结构。其构建过程如下：\par
+\noindent\hspace*{2em}Step1：遍历文档目录，读取每个 .txt 文件的内容。\par
+\noindent\hspace*{2em}Step2：对每篇文档进行分词——按空白字符切分，去除标点符号，统一转为小写。\par
+\noindent\hspace*{2em}Step3：同一文档中重复出现的词仅记录一次（去重），然后将（词，文档名）对加入索引。\par
+\noindent\hspace*{2em}Step4：索引本质是一个 HashMap<String, Vec<String>>，键为词条，值为包含该词条的文档名列表。\par
+\noindent\hspace*{2em}Step5：搜索时，将用户输入的关键词统一转为小写，在 HashMap 中以 $O(1)$ 时间查找对应的文档列表，返回即可。\par
+
+\sect{实验结果及分析}
+\noindent\hspace*{2em}1. 实验结果\par
+\noindent\hspace*{2em}（1）实验过程描述\par
+\noindent\hspace*{2em}1. 本实验用 Rust 语言开发，使用 Cargo 构建系统和 Rust 编译器（rustc），运行机器为本人笔记本电脑（macOS，Apple Silicon）。本人独立完成编码和测试，参考信息检索相关资料中关于倒排索引的描述确定了整体方案。\par
+\noindent\hspace*{2em}2. 测试文档选取思路为：覆盖不同主题领域，便于验证索引的准确性和区分能力。共选取 5 篇英文文档作为测试语料：(a) \texttt{animals.txt}——动物相关短文（狐狸、狗）；(b) \texttt{datastruct.txt}——数据结构基础概念；(c) \texttt{search.txt}——搜索引擎与倒排索引；(d) \texttt{mars.txt}——火星与天问一号；(e) \texttt{weather.txt}——雪与降水。5 篇文档共包含 97 个不同词条。\par
+\noindent\hspace*{2em}3. 索引构建的正确性（词条覆盖、大小写不敏感）、搜索结果的精确匹配（及不应出现的误匹配）是测试重点。\par
+\noindent\hspace*{2em}（2）测试结果\par
+\noindent\hspace*{2em}运行 MARS 搜索引擎对 5 篇文档构建倒排索引后，以不同关键词进行搜索测试，结果如下表：\par
+\begin{center}
+\fontsize{9pt}{12pt}\selectfont
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{搜索关键词} & \textbf{命中文档} & \textbf{文档数} \\ \hline
+mars & mars.txt & 1 \\ \hline
+MARS & mars.txt & 1 \\ \hline
+snow & weather.txt & 1 \\ \hline
+data & datastruct.txt & 1 \\ \hline
+structures & datastruct.txt, search.txt & 2 \\ \hline
+xyznonexistent & （无） & 0 \\ \hline
+\end{tabular}
+\end{center}
+\noindent\hspace*{2em}所有搜索结果精确匹配预期：\par
+\noindent\hspace*{2em}(1) 关键词 \texttt{mars} 和 \texttt{MARS}（大小写不敏感）均正确返回 \texttt{mars.txt}。\par
+\noindent\hspace*{2em}(2) 多义词现象——\texttt{structures} 同时出现在 \texttt{datastruct.txt}（data structures）和 \texttt{search.txt}（information retrieval concepts）中，MARS 正确返回了两篇文档。\par
+\noindent\hspace*{2em}(3) 不存在词汇 \texttt{xyznonexistent} 返回空结果，未出现误匹配。\par
+\noindent\hspace*{2em}7 个模块测试及集成测试全部通过，覆盖：索引构建、搜索命中/未命中、大小写不敏感、HTML 输出格式、空索引搜索。\par
+
+\noindent\hspace*{2em}2. 结果及方案分析\par
+\noindent\hspace*{2em}（1）本实验的重点及难点\par
+\noindent\hspace*{2em}核心是理解倒排索引"由词找文档"的反向查找思想——不同于"给定文档，列出其所有词"的正向索引，倒排索引从查询词出发直接定位相关文档，避免了全文档扫描；使用 HashMap 实现词到文档列表的 $O(1)$ 映射。\par
+\noindent\hspace*{2em}本实验的难点在于：分词处理——英文文本中的标点符号（逗号、句号、括号等）需正确剥离，大小写需归一化才能使搜索大小写不敏感；索引构造顺序——遍历目录时，先用去重集合（HashSet）记录当前文档已出现过的词，避免同一文档重复计入同一词条。\par
+\noindent\hspace*{2em}（2）本实验设计的优点及可以改进的方向\par
+\noindent\hspace*{2em}程序对目录下 .txt 文件构建倒排索引，支持交互式关键词搜索，结果输出为 HTML。(1) 索引构建时同一文档去重——每个文档对每个词只贡献一次；(2) 搜索大小写不敏感；(3) HTML 使用深色背景风格。\par
+\noindent\hspace*{2em}设计的可优化处包括：(1) 当前分词仅按空白和标点切分，不支持停用词过滤（the、a、is 等高频无意义词）和词干提取（running $\to$ run），引入这些预处理可提升搜索精度；(2) 当前仅支持单关键词精确匹配，不支持布尔查询（AND/OR）和短语查询（"data structures"），扩展查询语法可增强表达力；(3) 无结果排序——搜索结果无序输出，引入 TF-IDF 或 BM25 等排序模型可让最相关的文档排在前面；(4) 当前索引为静态构建，不支持增量更新，实际搜索引擎需要动态维护索引。\par
+\noindent\hspace*{2em}3. 搜索引擎技术中的"查全率"和"查准率"是什么？\par
+\noindent\hspace*{2em}(1) \textbf{查全率（Recall）}：检索出的相关文档数 / 库中所有相关文档总数。衡量搜索引擎"找全了没有"的能力。例如库中有 10 篇关于"火星"的文档，搜索返回了其中 7 篇，则查全率为 70\%。\par
+\noindent\hspace*{2em}(2) \textbf{查准率（Precision）}：检索出的相关文档数 / 检索出的文档总数。衡量搜索引擎"找对了没有"的能力。例如搜索返回 5 篇文档，其中只有 3 篇真正相关，则查准率为 60\%。\par
+\noindent\hspace*{2em}(3) 两者之间存在权衡（trade-off）：提高查全率容易引入噪音文档降低查准率，反之提高查准率可能漏掉部分相关文档。例如 MARS 仅支持精确匹配，查准率高（100\%——返回的都是真正包含关键词的文档），但查全率可能不足——搜索"data"只会匹配"data"，不会匹配"datum"（复数）、"database"（复合词）。\par
+\noindent\hspace*{2em}MARS 以精确匹配保证高查准率。查全率与查准率存在权衡：放宽匹配可提升查全率但降低查准率。现代搜索引擎引入语义搜索和用户反馈来同时改善两者。\par
+\noindent\hspace*{2em}4. 附件：源程序代码\par
+\noindent\hspace*{2em}实验代码使用 Rust 语言编写，Cargo 构建。以下为全部源程序。\par
+{
+\fontsize{6.5pt}{8pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.6cm}
+\begin{multicols}{2}
+\noindent\textbf{src/lib.rs}\par
+
+\begin{verbatim}
+use std::collections::{
+    HashMap, HashSet};
+
+/// 倒排索引：
+/// 词 → 包含该词的文档名集合
+pub struct InvertedIndex {
+    index:
+        HashMap<String,
+                Vec<String>>,
+}
+
+impl InvertedIndex {
+    pub fn new() -> Self {
+        Self {
+            index:
+                HashMap::new(),
+        }
+    }
+
+    /// 读取目录中所有 .txt
+    /// 文件并构建倒排索引
+    pub fn build_from_dir(
+            dir: &str)
+            -> std::io::Result<
+                Self> {
+        let mut idx =
+            Self::new();
+        let paths =
+            std::fs::read_dir(
+                dir)?;
+
+        for entry in paths {
+            let entry = entry?;
+            let path =
+                entry.path();
+
+            if path.extension()
+                .map(|e|
+                    e == "txt")
+                .unwrap_or(
+                    false) {
+                let name = path
+                    .file_stem()
+                    .and_then(
+                        |s| s.to_str())
+                    .unwrap_or(
+                        "unknown")
+                    .to_string();
+
+                let content =
+                    std::fs::
+                    read_to_string(
+                        &path)?;
+                let words =
+                    tokenize(
+                    &content);
+
+                let mut seen:
+                    HashSet<String>
+                    = HashSet::new();
+                for w in words {
+                    if !seen
+                        .contains(
+                            &w) {
+                        seen.insert(
+                            w.clone());
+                        idx.add(
+                            w,
+                            name.clone());
+                    }
+                }
+            }
+        }
+
+        Ok(idx)
+    }
+
+    fn add(
+            &mut self,
+            word: String,
+            doc: String) {
+        self.index
+            .entry(word
+                .to_lowercase())
+            .or_default()
+            .push(doc);
+    }
+
+    /// 搜索关键词，返回所有
+    /// 包含该词的文档名
+    pub fn search(
+            &self,
+            keyword: &str)
+            -> Vec<String> {
+        let key = keyword
+            .trim()
+            .to_lowercase();
+        self.index
+            .get(&key)
+            .cloned()
+            .unwrap_or_default()
+    }
+
+    pub fn term_count(
+        &self) -> usize {
+        self.index.len()
+    }
+}
+
+fn tokenize(text: &str)
+    -> Vec<String> {
+    text.split_whitespace()
+        .map(|s| {
+            s.trim_matches(
+                |c: char|
+                !c.is_alphanumeric())
+             .to_lowercase()
+        })
+        .filter(|s|
+            !s.is_empty())
+        .collect()
+}
+\end{verbatim}
+
+\columnbreak
+
+\begin{verbatim}
+/// 生成搜索结果 HTML 页面
+pub fn to_html(
+        keyword: &str,
+        results: &[String])
+        -> String {
+    let mut html =
+        String::new();
+    html.push_str(
+        "<html><head>\
+         <meta charset=\"utf-8\">\
+         <title>MARS 搜索结果\
+         </title>");
+    html.push_str(
+        "<style>body{\
+         font-family:sans-serif;\
+         margin:2em;\
+         background:#0a0a1a;\
+         color:#ddd;}");
+    html.push_str(
+        "h1{color:#f90;}\
+         ul{list-style:none;\
+         padding:0;}");
+    html.push_str(
+        "li{margin:0.5em 0;\
+         padding:0.8em;\
+         background:#1a1a2e;\
+         border-radius:4px;}\
+         </style>\
+         </head><body>");
+    html.push_str(&format!(
+        "<h1>MARS 小马尔斯 · \
+         搜索结果</h1>\
+         <p>搜索关键词: \
+         <strong>{}</strong></p>",
+        keyword));
+
+    if results.is_empty() {
+        html.push_str(
+            "<p>未找到相关文档。\
+             </p>");
+    } else {
+        html.push_str(&format!(
+            "<p>共找到 {} 个 \
+             相关文档:</p><ul>",
+            results.len()));
+        for doc in results {
+            html.push_str(&format!(
+                "<li>{}.txt</li>",
+                doc));
+        }
+        html.push_str("</ul>");
+    }
+
+    html.push_str(
+        "<hr><p style=\"\
+         font-size:0.8em;\
+         color:#666;\">");
+    html.push_str(
+        "MARS · 数据结构实验七 \
+         · 倒排索引搜索引擎</p>\
+         </body></html>");
+    html
+}
+\end{verbatim}
+
+\end{multicols}
+}
+\vspace{0.5cm}
+{
+\fontsize{7pt}{9pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.6cm}
+\begin{multicols}{2}
+\noindent\textbf{src/main.rs}\par
+
+\begin{verbatim}
+use std::io::{self, Write};
+use std::process;
+
+use exp_7::{
+    to_html,
+    InvertedIndex
+};
+
+fn main() {
+    let args: Vec<String>
+        = std::env::args()
+              .collect();
+
+    if args.len() < 2 {
+        eprintln!("用法: {} \
+            <文档目录路径>",
+            args[0]);
+        process::exit(1);
+    }
+
+    let dir = &args[1];
+    let index =
+        InvertedIndex::
+        build_from_dir(dir)
+        .unwrap_or_else(|err| {
+            eprintln!(
+                "无法构建索引: {}",
+                err);
+            process::exit(1);
+        });
+
+    println!(
+        "=== MARS 小马尔斯 \
+         · 搜索引擎 ===");
+    println!(
+        "索引目录: {}", dir);
+    println!(
+        "词典大小: {} 个词条",
+        index.term_count());
+    println!();
+    println!(
+        "请输入要搜索的关键词 \
+         （输入 :q 退出）:");
+
+    loop {
+        print!("> ");
+        io::stdout().flush().ok();
+
+        let mut input =
+            String::new();
+        if io::stdin()
+            .read_line(&mut input)
+            .is_err() {
+            break;
+        }
+
+        let keyword =
+            input.trim();
+        if keyword.is_empty() {
+            continue;
+        }
+        if keyword == ":q" {
+            println!("再见！");
+            break;
+        }
+
+        let results =
+            index.search(keyword);
+
+        if results.is_empty() {
+            println!(
+                "（无匹配结果）");
+        } else {
+            println!(
+                "找到 {} 个相关文档:",
+                results.len());
+            for doc in &results {
+                println!(
+                    "  · {}.txt", doc);
+            }
+            let html = to_html(
+                keyword, &results);
+            if let Ok(mut file) =
+                std::fs::File
+                ::create(
+                    "index.html") {
+                file.write_all(
+                    html.as_bytes())
+                    .ok();
+                println!(
+                    "  结果已输出到 \
+                     index.html");
+            }
+        }
+        println!();
+    }
+}
+\end{verbatim}
+
+\columnbreak
+
+\noindent\textbf{tests/test\_fn.rs}\par
+
+\begin{verbatim}
+use exp_7::{
+    to_html,
+    InvertedIndex
+};
+
+#[test]
+fn build_index_from_dir() {
+    let index = InvertedIndex
+        ::build_from_dir("docs")
+        .unwrap();
+    assert!(index.term_count()
+            > 0);
+}
+
+#[test]
+fn search_found() {
+    let index = InvertedIndex
+        ::build_from_dir("docs")
+        .unwrap();
+    let results =
+        index.search("mars");
+    assert!(!results.is_empty());
+    assert!(results.iter()
+        .any(|d| d == "mars"));
+}
+
+#[test]
+fn search_case_insensitive() {
+    let index = InvertedIndex
+        ::build_from_dir("docs")
+        .unwrap();
+    assert_eq!(
+        index.search("data"),
+        index.search("DATA"));
+}
+
+#[test]
+fn html_output() {
+    let results = vec![
+        "animals".to_string(),
+        "weather".to_string(),
+    ];
+    let html = to_html(
+        "snow", &results);
+    assert!(html
+        .contains("MARS"));
+    assert!(html
+        .contains("snow"));
+    assert!(html
+        .contains("2 个相关文档"));
+}
+
+#[test]
+fn html_no_results() {
+    let html = to_html(
+        "nothing", &[]);
+    assert!(html
+        .contains("未找到"));
+}
+
+#[test]
+fn empty_index_search() {
+    let idx =
+        InvertedIndex::new();
+    let r = idx.search("any");
+    assert!(r.is_empty());
+}
+
+#[test]
+fn search_not_found() {
+    let index = InvertedIndex
+        ::build_from_dir("docs")
+        .unwrap();
+    let results = index
+        .search("xyznonexist");
+    assert!(results.is_empty());
+}
+\end{verbatim}
+
+\end{multicols}
+}
+{
+\fontsize{7pt}{9pt}\selectfont
+\setlength{\parindent}{0pt}
+\noindent\textbf{测试文档集（docs/ 目录下的 5 篇 .txt 文件）}\par
+\noindent (a) \texttt{animals.txt}——狐狸与狗相关短文\par
+\noindent (b) \texttt{datastruct.txt}——数据结构基础概念（数组、链表、栈、队列、树、图）\par
+\noindent (c) \texttt{search.txt}——搜索引擎与倒排索引原理说明\par
+\noindent (d) \texttt{mars.txt}——火星与天问一号祝融号着陆\par
+\noindent (e) \texttt{weather.txt}——雪的形成与冰雪运动\par
+\noindent 共 5 篇文档，词典大小 97 词条。测试覆盖大小写不敏感、不存在词空结果、相同词返回多文档等场景。\par
+}

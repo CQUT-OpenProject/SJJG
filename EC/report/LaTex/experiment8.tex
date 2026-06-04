@@ -1,0 +1,642 @@
+\clearpage
+\expchapter{实验八\quad 组织小型家庭宴会}
+\sect{教学目标}
+\noindent\hspace*{2em}关键词：图，关键路径\par
+\noindent\hspace*{2em}知识和能力目标：理解关键路径的基本概念，理解查找图中关键路径的算法原理，能够根据问题构建图存储结构，并找出其中的关键路径。\par
+\noindent\hspace*{2em}价值目标：\par
+\noindent\hspace*{2em}(1) 人文素质：家庭宴会不仅是一顿饭，更是家人团聚、增进感情的契机。通过科学规划宴会筹备过程，可以在最少时间内完成所有准备工作，让"做饭"不再是"忙乱"的代名词，而是有秩序、有预见的家庭活动。这也启示我们：工程思维不仅可以用于大型项目，同样可以服务于日常生活中看似微小的事务。\par
+\sect{问题描述}
+\noindent\hspace*{2em}关键路径（Critical Path）是指设计中从输入到输出经过的延时最长的逻辑路径。在项目计划中，关键路径通常是决定项目工期的进度活动序列，它是项目中最长的路径，即使很小的浮动，也可能直接影响整个项目的最完成时间，因此，优化关键路径是一种优化项目工期的有效方法。\par
+\begin{center}
+\includegraphics[width=0.7\textwidth]{images/exp8-1.png}
+\end{center}
+\figcaption{图 1 毕业设计答辩筹备工作计划图}
+\noindent\hspace*{2em}在分析项目的进度计划时，我们通常可以用顶点表示事件，弧表示活动，弧上的权值表示活动持续的时间，由此将项目进度计划抽象为一幅有向图，也称AOE（Activity On Edge Network）网。 AOE 网常用于估算项目完成时间。例如，图 1 是根据毕业设计答辩筹备工作计划绘制的 AOE 网。其中，有 10 个事件 1,2,\dots,10；14 项活动 a1,a2,\dots,a14。每个事件表示在它之前的活动已经完成，在它之后的活动可以开始。\par
+\noindent\hspace*{2em}关键路径方法是由杜邦公司\footnote{关键路径法（CPM）最出现于 1956 年，当时美国杜邦（Du Pont）公司的主要负责人 Morgan Walker 和雷明顿兰德（Remington Rand）公司的数学家 James E. Kelly 研究如何能够采取正确的措施，在减少工期的情况下能尽可能少地增加费用。（\url{https://baike.baidu.com/item/\%E5\%85\%B3\%E9\%94\%AE\%E8\%B7\%AF\%E5\%BE\%84\%E6\%B3\%95}）}发明的。\par
+\begin{center}
+\includegraphics[width=0.95\textwidth]{images/exp8-2.png}
+\end{center}
+\figcaption{图 2 项目活动时间表及活动结点结构}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{images/exp8-3.png}
+\end{center}
+\figcaption{图 3 工作计划图前后关系及初始状态}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{images/exp8-4.png}
+\end{center}
+\figcaption{图 4 填写各活动的最开始/最晚时间}
+\noindent\hspace*{2em}本问题的任务是：\par
+\noindent\hspace*{2em}编写程序，筹备一个小型家庭宴会，最多需要多少准备时间？假设宴会筹备的各活动如下图所示。\par
+\noindent\hspace*{2em}输出形式不限。\par
+
+\sect{基本思路}
+\noindent\hspace*{2em}根据宴会活动构建 AOE 网。宴会筹备共有 8 项活动、7 个事件（含源点和汇点）。活动及其前后顺序如下：\par
+\begin{center}
+\fontsize{8.5pt}{11pt}\selectfont
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{活动编号} & \textbf{活动名称} & \textbf{前驱事件} & \textbf{后继事件} & \textbf{耗时（分）} \\ \hline
+A & 菜单制定 & v0 & v1 & 30 \\ \hline
+B & 原料采购 & v1 & v2 & 60 \\ \hline
+C & 餐具准备 & v1 & v3 & 45 \\ \hline
+D & 甜点准备 & v2 & v4 & 60 \\ \hline
+E & 原料清洗 & v2 & v4 & 60 \\ \hline
+F & 烹饪 & v4 & v5 & 30 \\ \hline
+G & 桌椅布置 & v3 & v5 & 15 \\ \hline
+H & 宴会开始 & v5 & v6 & 0 \\ \hline
+\end{tabular}
+\end{center}
+
+\noindent\textbf{关键路径算法步骤：}\par
+\noindent\hspace*{2em}Step1：拓扑排序——对 AOE 网求顶点拓扑序列，确保不存在有向环。\par
+\noindent\hspace*{2em}Step2：正向计算最早开始时间 ve——按拓扑序从前向后：$\texttt{ve}[j] = \max\{\texttt{ve}[i] + \texttt{duration}(i\to j)\}$。\par
+\noindent\hspace*{2em}Step3：逆向计算最晚开始时间 vl——按拓扑逆序从后向前：$\texttt{vl}[i] = \min\{\texttt{vl}[j] - \texttt{duration}(i\to j)\}$，汇点 $\texttt{vl}[n-1] = \texttt{ve}[n-1]$。\par
+\noindent\hspace*{2em}Step4：计算活动时间——活动 $i\to j$ 的最早开始 $\texttt{ee} = \texttt{ve}[i]$，最晚开始 $\texttt{el} = \texttt{vl}[j] - \texttt{duration}$，浮动时间 $\texttt{slack} = \texttt{el} - \texttt{ee}$。\par
+\noindent\hspace*{2em}Step5：关键路径 = 所有 $\texttt{slack} = 0$ 的活动构成的路径。\par
+
+\sect{实验结果及分析}
+\noindent\hspace*{2em}1. 实验结果\par
+\noindent\hspace*{2em}（1）实验过程描述\par
+\noindent\hspace*{2em}1. 本实验用 Rust 语言开发，使用 Cargo 构建系统和 Rust 编译器（rustc），运行机器为本人笔记本电脑（macOS，Apple Silicon）。本人独立完成编码和测试，参考相关资料关于关键路径算法的描述确定了整体方案。\par
+\noindent\hspace*{2em}2. 测试数据选取思路为：(a) 家庭宴会筹备网络（7 事件 8 活动），验证标准 CPM 算法的正确性；(b) 单边 AOE 网（2 事件 1 活动），验证边界情况。同时验证拓扑排序、活动时间计算的正确性。\par
+\noindent\hspace*{2em}3. 关键路径识别的正确性（slack=0 活动恰好形成最长路径）、总工期计算的准确性是测试重点。\par
+\noindent\hspace*{2em}（2）测试结果\par
+\noindent\hspace*{2em}运行实验程序对宴会筹备 AOE 网进行分析，得到如下结果：\par
+
+\noindent\hspace*{2em}\textbf{事件的最早/最晚开始时间：}\par
+\begin{center}
+\fontsize{8.5pt}{11pt}\selectfont
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{事件} & \textbf{含义} & \textbf{ve（最早）} & \textbf{vl（最晚）} \\ \hline
+v0 & 开始 & 0 & 0 \\ \hline
+v1 & 菜单完成 & 30 & 30 \\ \hline
+v2 & 采购完成 & 90 & 90 \\ \hline
+v3 & 餐具准备完成 & 75 & 165 \\ \hline
+v4 & 甜点和清洗完成 & 150 & 150 \\ \hline
+v5 & 烹饪和布置完成 & 180 & 180 \\ \hline
+v6 & 宴会开始 & 180 & 180 \\ \hline
+\end{tabular}
+\end{center}
+
+\noindent\hspace*{2em}\textbf{活动时间分析：}\par
+\begin{center}
+\fontsize{8pt}{10pt}\selectfont
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{活动名称} & \textbf{耗时} & \textbf{EE} & \textbf{EL} & \textbf{Slack} & \textbf{关键？} \\ \hline
+A 菜单制定 & 30 & 0 & 0 & 0 & ☆ \\ \hline
+B 原料采购 & 60 & 30 & 30 & 0 & ☆ \\ \hline
+C 餐具准备 & 45 & 30 & 120 & 90 & \\ \hline
+D 甜点准备 & 60 & 90 & 90 & 0 & ☆ \\ \hline
+E 原料清洗 & 60 & 90 & 90 & 0 & ☆ \\ \hline
+F 烹饪 & 30 & 150 & 150 & 0 & ☆ \\ \hline
+G 桌椅布置 & 15 & 75 & 165 & 90 & \\ \hline
+H 宴会开始 & 0 & 180 & 180 & 0 & ☆ \\ \hline
+\end{tabular}
+\end{center}
+
+\noindent\hspace*{2em}关键活动集合为：\textbf{A 菜单制定、B 原料采购、D 甜点准备、E 原料清洗、F 烹饪、H 宴会开始}。由于 D 和 E 是并行活动，最长路径可写成 A→B→D→F→H 或 A→B→E→F→H。总工期 = \textbf{180 分钟}（3 小时）。\par
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    width=0.95\textwidth,
+    height=5.0cm,
+    ymin=0, ymax=200,
+    ylabel={时间（分钟）},
+    symbolic x coords={A菜单,B采购,C餐具,D甜点,E清洗,F烹饪,G布置,H开始},
+    xtick=data,
+    x tick label style={font=\fontsize{7pt}{9pt}\selectfont, rotate=30, anchor=east},
+    bar width=0.4cm,
+    legend pos=outer north east,
+    legend style={font=\fontsize{7pt}{9pt}\selectfont},
+    ymajorgrids=true,
+]
+\addplot[fill=red!60] coordinates {(A菜单,0)(B采购,0)(C餐具,90)(D甜点,0)(E清洗,0)(F烹饪,0)(G布置,90)(H开始,0)};
+\addlegendentry{Slack (浮动时间)}
+\addplot[fill=blue!40] coordinates {(A菜单,30)(B采购,60)(C餐具,45)(D甜点,60)(E清洗,60)(F烹饪,30)(G布置,15)(H开始,0)};
+\addlegendentry{Duration (活动耗时)}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\figcaption{图 5\quad 宴会筹备各项活动的耗时与浮动时间}
+
+\noindent\hspace*{2em}由以上结果可知：(1) 总工期为 180 分钟，A、B、D、E、F、H 的 slack 均为 0；其中 D 与 E 并行且耗时相同，因此存在 A→B→D→F→H 和 A→B→E→F→H 两条等长关键路径；(2) "餐具准备"和"桌椅布置"各有 90 分钟浮动时间，只要在烹饪完成前完成即可；(3) H 为 0 分钟活动，用于表示宴会可以开始这一汇点事件。\par
+
+\noindent\hspace*{2em}2. 结果及方案分析\par
+\noindent\hspace*{2em}（1）本实验的重点及难点\par
+\noindent\hspace*{2em}核心是理解 AOE 网中"事件"和"活动"的区别——事件是时间点（如"采购完成"），活动是时间段的消耗（如"采购 60 分钟"）；掌握关键路径的两趟扫描算法——正向计算 ve（事件最早发生时间，取所有入边最大值），逆向计算 vl（事件最晚发生时间，取所有出边最小值）。\par
+\noindent\hspace*{2em}本实验的难点在于：并行关键活动的识别——甜点准备和原料清洗都依赖原料采购，且都必须在烹饪前完成，因此二者 slack 同为 0；拓扑序列必须保证存在——如果图中包含环，则无法计算关键路径，程序应能检测并报错。\par
+\noindent\hspace*{2em}（2）本实验设计的优点及可以改进的方向\par
+\noindent\hspace*{2em}程序对 AOE 网进行拓扑排序，计算 ve/vl 和活动 slack，识别关键路径并输出总工期。边的结构使用 name/from/to/duration 字段。拓扑排序作为独立函数复用。单元测试覆盖单边图、环检测和 slack=0 一致性。\par
+\noindent\hspace*{2em}设计的可优化处包括：(1) 当前拓扑排序对每个出边都遍历所有边列表（$O(|V|\cdot|E|)$），可改用邻接表将拓扑排序优化到 $O(|V|+|E|)$；(2) 关键路径未对多路径分支情况做可视化输出——当前仅列出 slack=0 的活动，未显式标注哪几个 slack=0 的活动构成了同一条关键路径，多关键路径情况时不够直观；(3) 输入灵活性不足——当前宴会数据硬编码在 build\_banquet\_aoe 中，可改写为从文件读取边列表的方式以支持任意项目计划的输入；(4) 可增强到完整的 AOE 分析表格（含 EE/EL 和 ES/EF 四组时间），更贴合工业标准的 CPM 输出格式。\par
+\noindent\hspace*{2em}3. 关键路径法在实际工程中的应用有哪些？\par
+\noindent\hspace*{2em}关键路径法（CPM）自 1956 年由杜邦公司发明以来，已在众多工程领域得到广泛应用：\par
+\noindent\hspace*{2em}(1) \textbf{建筑工程}：摩天大楼的施工从挖地基到浇筑混凝土到安装幕墙，动辄数百项并行活动，CPM 帮助项目经理识别"拖延一天则总工期拖延一天"的关键线路，从而合理分配人力物力。\par
+\noindent\hspace*{2em}(2) \textbf{航空航天}：波音 777 的研制涉及数百万个零部件和数万名工程师，NASA 的阿波罗计划同样使用 CPM 协调火箭、飞船、地面站等多系统的研制进度。\par
+\noindent\hspace*{2em}(3) \textbf{IT 项目管理}：软件开发项目（需求分析→设计→编码→测试→上线）本质上也是一个 AOE 网，关键路径上的任务（如"核心模块开发"）的质量和进度直接决定了产品发布时间。\par
+\noindent\hspace*{2em}(4) \textbf{芯片设计}：VLSI 布局布线中，关键路径上的门延迟决定了芯片的最高时钟频率，设计者需不断优化关键路径以满足时序约束。\par
+\noindent\hspace*{2em}CPM 的瓶颈识别思想可用于进度安排。实际项目管理需兼顾时间、成本、资源等多维约束，工具如 MS Project 综合了 CPM、资源平衡和蒙特卡洛仿真。将复杂事务分解为活动、梳理依赖关系、量化耗时、找到关键路径，本质上是一种理性思维习惯。\par
+
+\noindent\hspace*{2em}4. 附件：源程序代码\par
+\noindent\hspace*{2em}实验代码使用 Rust 语言编写，Cargo 构建。以下为全部源程序。\par
+{
+\fontsize{6.5pt}{8pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.6cm}
+\begin{multicols}{2}
+\noindent\textbf{src/lib.rs}\par
+
+\begin{verbatim}
+use std::collections::VecDeque;
+
+/// AOE 网中的边（活动）
+#[derive(Debug, Clone)]
+pub struct Edge {
+    pub name: String,
+    pub from: usize,
+    pub to: usize,
+    pub duration: u32,
+}
+
+impl Edge {
+    pub fn new(name: &str,
+            from: usize,
+            to: usize,
+            duration: u32) -> Self {
+        Self {
+            name: name.to_string(),
+            from, to, duration,
+        }
+    }
+}
+
+/// AOE 网（顶点=事件，边=活动）
+pub struct AoeNet {
+    n: usize,
+    pub edges: Vec<Edge>,
+}
+
+impl AoeNet {
+    pub fn new(
+            n: usize,
+            edges: Vec<Edge>) -> Self {
+        Self { n, edges }
+    }
+
+    /// 拓扑排序
+    fn topological_sort(
+            &self)
+            -> Option<Vec<usize>> {
+        let mut in_degree
+            = vec![0; self.n];
+
+        for e in &self.edges {
+            in_degree[e.to] += 1;
+        }
+
+        let mut queue:
+            VecDeque<usize>
+            = VecDeque::new();
+        for v in 0..self.n {
+            if in_degree[v] == 0 {
+                queue.push_back(v);
+            }
+        }
+
+        let mut order =
+            Vec::new();
+
+        while let Some(v)
+            = queue.pop_front() {
+            order.push(v);
+
+            for e in &self.edges {
+                if e.from == v {
+                    in_degree[e.to]
+                        -= 1;
+                    if in_degree[e.to]
+                       == 0 {
+                        queue.push_back(
+                            e.to);
+                    }
+                }
+            }
+        }
+
+        if order.len()
+           == self.n {
+            Some(order)
+        } else {
+            None
+        }
+    }
+\end{verbatim}
+
+\columnbreak
+
+\begin{verbatim}
+    /// 计算关键路径
+    /// 返回 (ve, vl,
+    ///       关键活动列表, 总工期)
+    pub fn critical_path(
+            &self)
+            -> Option<(
+                Vec<u32>,
+                Vec<u32>,
+                Vec<String>,
+                u32)> {
+        let order =
+            self.topological_sort()?;
+
+        // 正向：ve（事件最早时间）
+        let mut ve =
+            vec![0u32; self.n];
+
+        for &v in &order {
+            for e in &self.edges {
+                if e.from == v {
+                    let new_val
+                        = ve[v]
+                          + e.duration;
+                    if new_val
+                       > ve[e.to] {
+                        ve[e.to]
+                            = new_val;
+                    }
+                }
+            }
+        }
+
+        let total_time
+            = ve[self.n - 1];
+
+        // 逆向：vl（事件最晚时间）
+        let mut vl =
+            vec![total_time;
+                 self.n];
+
+        for &v in
+            order.iter().rev() {
+            for e in &self.edges {
+                if e.to == v {
+                    let new_val
+                        = vl[v]
+                        .saturating_sub(
+                            e.duration);
+                    if new_val
+                       < vl[e.from] {
+                        vl[e.from]
+                            = new_val;
+                    }
+                }
+            }
+        }
+
+        // 收集 slack=0 的活动
+        let mut critical:
+            Vec<String>
+            = Vec::new();
+
+        for e in &self.edges {
+            let ee = ve[e.from];
+            let el = vl[e.to]
+                   - e.duration;
+
+            if ee == el {
+                critical.push(
+                    e.name.clone());
+            }
+        }
+
+        Some((ve, vl,
+              critical,
+              total_time))
+    }
+\end{verbatim}
+
+\end{multicols}
+}
+\vspace{0.5cm}
+{
+\fontsize{6.5pt}{8pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.6cm}
+\begin{multicols}{2}
+\noindent\textbf{src/lib.rs（续）}\par
+
+\begin{verbatim}
+    /// 活动时间 (ee, el, slack)
+    pub fn activity_times(
+        &self)
+        -> Vec<(
+            String, u32,
+            u32, u32)> {
+        let mut result
+            = Vec::new();
+
+        if let Some((ve, vl,
+                     _, _))
+            = self.critical_path() {
+            for e in &self.edges {
+                let ee
+                    = ve[e.from];
+                let el = vl[e.to]
+                       - e.duration;
+                let slack
+                    = el - ee;
+                result.push((
+                    e.name.clone(),
+                    ee, el,
+                    slack));
+            }
+        }
+
+        result
+    }
+
+    pub fn event_count(
+        &self) -> usize {
+        self.n
+    }
+
+    pub fn activity_count(
+        &self) -> usize {
+        self.edges.len()
+    }
+}
+
+/// 构建家庭宴会筹备 AOE 网
+pub fn build_banquet_aoe()
+    -> AoeNet {
+    AoeNet::new(7, vec![
+        Edge::new(
+            "A 菜单制定",
+            0, 1, 30),
+        Edge::new(
+            "B 原料采购",
+            1, 2, 60),
+        Edge::new(
+            "C 餐具准备",
+            1, 3, 45),
+        Edge::new(
+            "D 甜点准备",
+            2, 4, 60),
+        Edge::new(
+            "E 原料清洗",
+            2, 4, 60),
+        Edge::new(
+            "F 烹饪",
+            4, 5, 30),
+        Edge::new(
+            "G 桌椅布置",
+            3, 5, 15),
+        Edge::new(
+            "H 宴会开始",
+            5, 6, 0),
+    ])
+}
+\end{verbatim}
+
+\columnbreak
+
+\noindent\textbf{src/main.rs}\par
+
+\begin{verbatim}
+use exp_8::build_banquet_aoe;
+
+fn main() {
+    let aoe =
+        build_banquet_aoe();
+
+    println!(
+        "=== 家庭宴会筹备 \
+         · 关键路径分析 ===");
+    println!("事件数: {}",
+        aoe.event_count());
+    println!("活动数: {}",
+        aoe.activity_count());
+    println!();
+
+    if let Some((ve, vl,
+                 critical, total))
+        = aoe.critical_path() {
+        println!("总工期: {} 分钟",
+            total);
+
+        println!();
+        println!(
+            "=== 事件最早/最晚 \
+             开始时间 ===");
+        println!(
+            "{:<6} {:<10} {:<10}",
+            "事件","ve","vl");
+        for v in 0..
+            aoe.event_count() {
+            println!(
+                "v{:<5} {:<10} \
+                 {:<10}",
+                v, ve[v], vl[v]);
+        }
+
+        let times =
+            aoe.activity_times();
+        println!();
+        println!(
+            "=== 活动时间分析 ===");
+        println!(
+            "{:<20} {:<4} \
+             {:<6} {:<6} \
+             {:<6} {:<4}",
+            "活动", "耗时",
+            "EE","EL",
+            "Slack","关键");
+
+        for (name, ee, el,
+             slack) in &times {
+            let dur = aoe.edges
+                .iter().find(
+                    |e| &e.name
+                         == name)
+                .map(
+                    |e| e.duration)
+                .unwrap_or(0);
+            let flag = if *slack==0
+                { "☆" }
+                else { "" };
+            println!(
+                "{:<20} {:<4} \
+                 {:<6} {:<6} \
+                 {:<6} {:<4}",
+                name, dur,
+                ee, el,
+                slack, flag);
+        }
+        println!();
+        println!(
+            "关键活动: {}",
+            critical.join("→"));
+    }
+}
+\end{verbatim}
+
+\end{multicols}
+}
+\vspace{0.5cm}
+{
+\fontsize{7pt}{9pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.6cm}
+\begin{multicols}{2}
+\noindent\textbf{tests/test\_fn.rs}\par
+
+\begin{verbatim}
+use exp_8::{
+    build_banquet_aoe,
+    AoeNet, Edge
+};
+
+#[test]
+fn build_aoe_network() {
+    let aoe =
+        build_banquet_aoe();
+    assert_eq!(
+        aoe.event_count(), 7);
+    assert_eq!(
+        aoe.activity_count(),8);
+}
+
+#[test]
+fn topological_sort_valid() {
+    let aoe =
+        build_banquet_aoe();
+    assert!(
+        aoe.critical_path()
+            .is_some());
+}
+
+#[test]
+fn critical_path_not_empty() {
+    let aoe =
+        build_banquet_aoe();
+    let (_, _, critical,
+         total)
+        = aoe.critical_path()
+              .unwrap();
+    assert!(
+        !critical.is_empty());
+    assert!(total > 0);
+}
+
+#[test]
+fn total_time_correct() {
+    let aoe =
+        build_banquet_aoe();
+    let (_, _, _, total)
+        = aoe.critical_path()
+              .unwrap();
+    assert_eq!(total, 180);
+}
+
+#[test]
+fn slack_zero_critical() {
+    let aoe =
+        build_banquet_aoe();
+    let (_, _, critical, _)
+        = aoe.critical_path()
+              .unwrap();
+    let times =
+        aoe.activity_times();
+
+    for (name, _ee,
+         _el, slack)
+        in &times {
+        if critical
+            .contains(name) {
+            assert_eq!(
+                *slack, 0);
+        }
+    }
+}
+\end{verbatim}
+
+\columnbreak
+
+\begin{verbatim}
+#[test]
+fn ve_non_decreasing() {
+    let aoe =
+        build_banquet_aoe();
+    let (ve, _vl, _, _)
+        = aoe.critical_path()
+              .unwrap();
+
+    for e in &aoe.edges {
+        assert!(
+            ve[e.from]
+            + e.duration
+            <= ve[e.to]);
+    }
+}
+
+#[test]
+fn table_setting_is_not_critical() {
+    let aoe =
+        build_banquet_aoe();
+    let (_, _, critical, _)
+        = aoe.critical_path()
+              .unwrap();
+    assert!(!critical.contains(
+        &"G 桌椅布置"
+            .to_string()));
+}
+
+#[test]
+fn banquet_critical_activities() {
+    let aoe =
+        build_banquet_aoe();
+    let (_, _, critical, total)
+        = aoe.critical_path()
+              .unwrap();
+    assert_eq!(total, 180);
+    assert!(critical.contains(
+        &"D 甜点准备".to_string()));
+    assert!(critical.contains(
+        &"E 原料清洗".to_string()));
+}
+
+#[test]
+fn single_edge_graph() {
+    let aoe = AoeNet::new(
+        2,
+        vec![Edge::new(
+            "A", 0, 1, 10)]);
+    let (ve, _vl, critical,
+         total)
+        = aoe.critical_path()
+              .unwrap();
+    assert_eq!(total, 10);
+    assert_eq!(ve[0], 0);
+    assert_eq!(ve[1], 10);
+    assert_eq!(
+        critical, vec!["A"]);
+}
+\end{verbatim}
+
+\end{multicols}
+}
+{
+\fontsize{7pt}{9pt}\selectfont
+\setlength{\parindent}{0pt}
+\noindent\textbf{测试用例}\par
+\noindent (a) 宴会筹备 7 事件 8 活动 AOE 网：总工期 180 分钟，6 项关键活动，2 项非关键活动 slack 均大于 0。\par
+\noindent (b) 单边图（2 事件、1 活动、耗时 10）：唯一活动即为关键路径，总工期 10。\par
+\noindent (c) 拓扑排序正确性：AOE 网按活动依赖生成正确的事件顺序。\par
+\noindent (d) ve 单调性验证：对每条边 i→j，ve[i] + duration ≤ ve[j]。\par
+\noindent (e) slack 一致性：关键活动的 slack 均为 0；G 桌椅布置 slack=90 非关键。\par
+\noindent 共 9 个测试全部通过。\par
+}

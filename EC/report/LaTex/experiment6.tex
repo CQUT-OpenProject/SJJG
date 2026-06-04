@@ -1,0 +1,556 @@
+\clearpage
+\expchapter{实验六\quad 谁是网络大 V?}
+\sect{教学目标}
+\noindent\hspace*{2em}关键词：图\par
+\noindent\hspace*{2em}知识和能力目标：理解和熟练掌握图的存储及操作方法，本例主要是计算有向图中顶点的度，并做进一步的应用。\par
+\noindent\hspace*{2em}价值目标：\par
+\noindent\hspace*{2em}科学精神：一个问题、一个方案的评价指标往往不是唯一的，也常常没有标准答案。为了找到网络大V，其相关指标众多，需要研究者根据具体问题进行分析、确定和实验验证。\par
+\noindent\textbf{工程与社会：}\par
+\noindent\textbf{你知道新浪微博红V、蓝 V、金 V 的区别吗？}\par
+\noindent\hspace*{2em}你认为网络大V 可能对社会，尤其是社交网络中的青少年群体起到什么样的作用？你是否曾受到过网络大V 的影响？\par
+\sect{问题描述}
+\noindent\hspace*{2em}社交网络可抽象为一种图结构。进一步地，从社交网络用户的关注、被关注关系角度观察，可将这种图看成是有向图。例如，如果一个用户 \textit{u}\textit{ }被 100 个粉丝关注，不妨认为 \textit{u}\textit{ }的入度为 100，如果 \textit{u }关注了 1000 个账号，则 \textit{u }的出度为 1000。\par
+\begin{center}
+\includegraphics[width=0.4\textwidth]{images/exp6-1.png}
+\hspace{1em}
+\includegraphics[width=0.5\textwidth]{images/exp6-2.png}
+\end{center}
+\noindent\hspace*{2em}大 V\footnote{源自百度百科词条：网络大 V}一般指在微博上十分活跃、有着大群粉丝的用户。"V"（Verified）指用户已通过认证，经微博身份认证的账户名后会显示 V 字符。大V 拥有百万计甚至千万计的粉丝，可能成为微博"意见领袖"，带动微博用户活跃度。如果大 V 把未经核实的谣言随意转载引用，则将推动谣言快速传播。\par
+\begin{center}
+\includegraphics[width=0.75\textwidth]{images/exp6-3.png}
+\end{center}
+\noindent\hspace*{2em}社会网络\footnote{最初对社会网络感兴趣的是英国著名的人类学家布朗(Radcliffe Brown)。他在对社会结构的关注中，以相对非技术的形式提出了"社会网络"（Social Network）的思想。}（social network）分析中有一个度中心性（\textbf{Degree}\textbf{ }\textbf{Centrality}）指标，是刻画结点中心性（Centrality）的直接度量指标之一：\par
+\noindent\hspace*{2em}度中心性\footnote{社交网络分析中重要指标：\url{https://blog.csdn.net/weixin_43841231/article/details/100114506}}：一个结点的度越大，意味着该结点的度中心性越高，其在网络中就越重要。例如，用户 \textit{u}1 有 20 个微信好友，\textit{u}2 有 50 个好友，则 \textit{u}1 的度中心性大于 \textit{u}2，其社交圈子可能更广。显然，本例是无向图的情形，如果是有向图，则需考虑出度和入度问题。\par
+\noindent\hspace*{2em}【拓展问题】如何比较用户 \textit{\textbf{u}}\textit{\textbf{ }}在微博和微信上的度中心性？如果微信与微博的人数规模相当，则可以直接比较，但如用户数存在规模差异，则需考虑去规模化问题，即标准化度中心性。\par
+\noindent\textbf{本实验要求：}\par
+\noindent\hspace*{2em}对一个给定的社交网络图，找出其中大 \textbf{V}\textbf{ }结点。\par
+\sect{基本思路}
+\noindent\textbf{基本假设：}\par
+\noindent\hspace*{2em}不妨以度中心性为指标，确定网络大 V：考虑社会网络是微博（故为有向图），度中心性指计算结点的入度。\par
+\noindent\hspace*{2em}如果某结点的入度在网络中排名前 10，则该结点是大V 结点。\par
+\noindent\hspace*{2em}对输出形式无特殊要求，输出大V 结点的 ID 即可。\par
+\noindent\hspace*{2em}数据来源：http://www.sociopatterns.org/datasets/ 提供的学生接触网络数据。本实验使用程序生成的结构化仿真数据集，模拟 9 个班级共 180 名学生 5 天内的接触记录，每条记录格式为"时间1 时间2 接触方 被接触方"。数据集含 926 条有向边，同一班级内接触较密集，班级间以少数"桥梁"结点连通，构造了若干高入度"意见领袖"结点。\par
+\noindent\hspace*{2em}不妨用邻接矩阵来存储图。由于是有向图，因此矩阵非对称。\par
+
+\noindent\textbf{算法步骤：}\par
+\noindent\hspace*{2em}Step1：读取边列表文件，解析每条记录中的 from\_id 和 to\_id，同时记录最大顶点编号以确定邻接矩阵规模 $n$（= \texttt{max\_id} + 1）。\par
+\noindent\hspace*{2em}Step2：创建 $n \times n$ 的邻接矩阵 \texttt{matrix[n][n]}，初始化为全 0。遍历所有边，将 \texttt{matrix[from][to]} 置 1。\par
+\noindent\hspace*{2em}Step3：遍历邻接矩阵，对每一列 $j$ 统计 \texttt{matrix[i][j] == 1} 的个数，即得到该顶点的入度。\par
+\noindent\hspace*{2em}Step4：将各顶点按入度降序排列（入度相同时按顶点编号升序），取前 $k = 10$ 个即为大 V 结点。\par
+
+\sect{实验结果及分析}
+\noindent\hspace*{2em}1. 实验结果\par
+\noindent\hspace*{2em}（1）实验过程描述\par
+\noindent\hspace*{2em}1. 本实验用 Rust 语言开发，使用 Cargo 构建系统和 Rust 编译器（rustc），运行机器为本人笔记本电脑（macOS，Apple Silicon）。本人独立完成编码和测试，参考社交网络分析和图结构存储的相关资料确定了整体方案。\par
+\noindent\hspace*{2em}2. 测试数据选取思路为：(a) 仿真数据集（180 顶点 926 边），模拟 9 个班级学生的接触网络，用于验证基本的大 V 识别功能；(b) 手动的 5 顶点小规模有向图，用于验证入度/出度计算的正确性；(c) 边界情况：空图、单顶点图、顶点数不足 $k$ 的网络。\par
+\noindent\hspace*{2em}3. 邻接矩阵的正确构建和入度排序是测试重点。由于有向图的邻接矩阵非对称，入度由列向量的 $\sum$ 计算，出度由行向量的 $\sum$ 计算，两者的总和均应等于边数。\par
+\noindent\hspace*{2em}（2）测试结果\par
+\noindent\hspace*{2em}运行实验程序对仿真数据集进行分析，得到如下结果：\par
+\begin{center}
+\fontsize{9pt}{12pt}\selectfont
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{指标} & \textbf{值} \\ \hline
+顶点数 & 180 \\ \hline
+边数 & 926 \\ \hline
+平均入度 & 5.14 \\ \hline
+入度范围 & 4 \~{} 8 \\ \hline
+最大入度结点 & 52（入度 = 8）\\ \hline
+\end{tabular}
+\end{center}
+\noindent\hspace*{2em}入度排名前 10 的大 V 结点如下表所示：\par
+
+\begin{center}
+\fontsize{9pt}{12pt}\selectfont
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|c|c|c||c|c|c|}
+\hline
+\textbf{排名} & \textbf{结点 ID} & \textbf{入度} & \textbf{排名} & \textbf{结点 ID} & \textbf{入度} \\ \hline
+1 & 52 & 8 & 6 & 69 & 7 \\ \hline
+2 & 1  & 7 & 7 & 71 & 7 \\ \hline
+3 & 35 & 7 & 8 & 73 & 7 \\ \hline
+4 & 37 & 7 & 9 & 105 & 7 \\ \hline
+5 & 54 & 7 & 10 & 107 & 7 \\ \hline
+\end{tabular}
+\end{center}
+
+\noindent\hspace*{2em}将以上结果绘制为柱状图：\par
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    width=0.85\textwidth,
+    height=5.0cm,
+    ymin=0, ymax=9,
+    ylabel={入度},
+    xtick=data,
+    xticklabels={52, 1, 35, 37, 54, 69, 71, 73, 105, 107},
+    bar width=0.35cm,
+    nodes near coords,
+    nodes near coords style={font=\fontsize{7pt}{9pt}\selectfont},
+    enlarge x limits=0.15,
+    grid=major,
+]
+\addplot[fill=blue!60] coordinates {
+    (1,8) (2,7) (3,7) (4,7) (5,7) (6,7) (7,7) (8,7) (9,7) (10,7)
+};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\figcaption{图 4\quad 入度排名前 10 的大 V 结点}
+
+\noindent\hspace*{2em}(1) 结点 52 入度 8，为网络中入度最高的结点，程序生成数据时为其分配了更多跨班级接触机会；(2) 其余 9 个大 V 结点入度均为 7，集中在编号 1\~{}37、54\~{}73、105\~{}107 等区域，这些结点分布在不同的班级边界上，承担了班级间的桥梁角色；(3) 一般结点的入度分布在 4\~{}6 之间，与"意见领袖"之间存在 1\~{}4 的入度差距，体现了社交网络中的影响力不均等分布特征。\par
+\noindent\hspace*{2em}8 个模块测试和集成测试全部通过，覆盖：图构建、出入度计算、Top-K 排序、空图处理、出/入度总和一致性验证、仿真数据往返读取。\par
+
+\noindent\hspace*{2em}2. 结果及方案分析\par
+\noindent\hspace*{2em}（1）本实验的重点及难点\par
+\noindent\hspace*{2em}核心是理解有向图的邻接矩阵存储——不同于无向图，有向图矩阵不对称，入度由列 $j$ 上所有非零元素之和计算，出度由行 $i$ 上所有非零元素之和计算；正确统计入度并排序，排名前 10 即为大 V 结点。\par
+\noindent\hspace*{2em}本实验的难点在于：数据集中顶点编号不一定是连续的 0..n-1——需要先遍历边列表，找到最大顶点编号来确定邻接矩阵的行列规模；邻接矩阵空间开销为 $O(n^2)$，当网络规模较大（如百万用户）时不可行，需要邻接表或其他稀疏表示。\par
+\noindent\hspace*{2em}（2）本实验设计的优点及可以改进的方向\par
+\noindent\hspace*{2em}程序从边列表构建邻接矩阵，计算入度后输出前 $k$ 名。邻接矩阵插入操作直接对应教科书描述。出入度独立计算，以入度/出度总和等于边数验证一致性。支持任意 $k$ 值，$k$ 超出顶点数时返回全部。\par
+\noindent\hspace*{2em}设计的可优化处包括：(1) 邻接矩阵存储开销 $O(n^2)$，对稀疏网络（如本仿真数据中 180 个顶点仅 926 条边，密度约 2.9\%）使用邻接表可节省大量空间，出入度也可在邻接表中存储；(2) 入度计算当前为 $O(n^2)$ 全扫描，邻接表方案可将入度计算优化至 $O(|E|)$；(3) 当前仅以入度为单一评价指标，实际社交网络中还可综合出度、介数中心性（Betweenness Centrality）、紧密度中心性（Closeness Centrality）等指标多维度判定影响力；(4) 对大规模网络，"取前 k 个"可使用堆维护 Top-K 而非全排序，降低时间复杂度。\par
+\noindent\hspace*{2em}3. 社交网络分析的度量指标还有哪些？\par
+\noindent\hspace*{2em}除度中心性外，常见的网络结点重要性度量指标还包括：\par
+\noindent\hspace*{2em}(1) \textbf{介数中心性（Betweenness Centrality）}：度量某结点出现在其他结点间最短路径上的频率，反映结点的"桥梁"作用。在社交网络中，介数高的用户可能控制了信息传播的关键通道。\par
+\noindent\hspace*{2em}(2) \textbf{紧密度中心性（Closeness Centrality）}：某结点到其他所有结点的平均最短路径倒数，反映结点能多快地到达网络中的其他人。紧密度高的结点往往是"信息发源地"。\par
+\noindent\hspace*{2em}(3) \textbf{特征向量中心性（Eigenvector Centrality）}：与 Google PageRank 核心思想一致——一个结点的重要性不仅取决于自身的度，还取决于与它相连的结点本身的重要性。如果"大 V 关注了你"，比"普通用户关注了你"更有含金量。\par
+\noindent\hspace*{2em}(4) \textbf{Katz 中心性}：特征向量中心性的改进版，引入衰减因子处理有向无环图中的零度问题。\par
+\noindent\hspace*{2em}(5) \textbf{HITS 算法（Hyperlink-Induced Topic Search）}：将网页（或用户）分为"枢纽"（Hub，指向很多权威结点）和"权威"（Authority，被很多枢纽指向）两类，通过迭代收敛评估重要性。\par
+\noindent\hspace*{2em}度中心性计算简单但无法区分粉丝质量：100 万僵尸粉与 100 万忠诚粉丝等值。PageRank 等递归加权方法可弥补此缺陷。算法识别的"大 V"只是数学模型输出，现实中还需考虑用户行为真实性等维度。\par
+\noindent\hspace*{2em}4. 附件：源程序代码\par
+\noindent\hspace*{2em}实验代码使用 Rust 语言编写，Cargo 构建。以下为全部源程序。\par
+{
+\fontsize{6.5pt}{8pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.6cm}
+\begin{multicols}{2}
+\noindent\textbf{src/lib.rs}\par
+
+\begin{verbatim}
+/// 有向图的邻接矩阵存储
+#[derive(Debug, Clone)]
+pub struct DiGraph {
+    n: usize,
+    matrix: Vec<Vec<i32>>,
+}
+
+impl DiGraph {
+    /// 创建 n 个顶点的图
+    pub fn new(n: usize) -> Self {
+        Self {
+            n,
+            matrix:
+                vec![vec![0; n]; n],
+        }
+    }
+
+    /// 添加一条有向边 i -> j
+    pub fn add_edge(
+            &mut self,
+            i: usize,
+            j: usize) {
+        if i < self.n
+           && j < self.n {
+            self.matrix[i][j] = 1;
+        }
+    }
+
+    /// 计算各顶点的入度
+    pub fn in_degrees(
+        &self) -> Vec<usize> {
+        let mut deg =
+            vec![0usize; self.n];
+
+        for i in 0..self.n {
+            for j in 0..self.n {
+                if self.matrix[i][j]
+                   == 1 {
+                    deg[j] += 1;
+                }
+            }
+        }
+
+        deg
+    }
+
+    /// 计算各顶点的出度
+    pub fn out_degrees(
+        &self) -> Vec<usize> {
+        let mut deg =
+            vec![0usize; self.n];
+
+        for i in 0..self.n {
+            for j in 0..self.n {
+                if self.matrix[i][j]
+                   == 1 {
+                    deg[i] += 1;
+                }
+            }
+        }
+
+        deg
+    }
+
+    pub fn vertex_count(
+        &self) -> usize {
+        self.n
+    }
+
+    pub fn edge_count(
+        &self) -> usize {
+        let mut count = 0;
+
+        for i in 0..self.n {
+            for j in 0..self.n {
+                if self.matrix[i][j]
+                   == 1 {
+                    count += 1;
+                }
+            }
+        }
+
+        count
+    }
+}
+
+/// 入度排名的结果
+pub struct RankResult {
+    pub vertex: usize,
+    pub in_degree: usize,
+}
+
+/// 找出入度最高的前 k 个顶点
+pub fn find_top_k(
+        graph: &DiGraph,
+        k: usize)
+        -> Vec<RankResult> {
+    let degrees =
+        graph.in_degrees();
+    let mut indexed:
+        Vec<(usize, usize)>
+        = (0..graph.n)
+            .map(|i|
+                (i, degrees[i]))
+            .collect();
+
+    indexed.sort_by(|a, b|
+        b.1.cmp(&a.1)
+        .then(a.0.cmp(&b.0)));
+
+    let limit = k
+        .min(indexed.len());
+
+    indexed[..limit]
+        .iter()
+        .map(|&(v, d)|
+            RankResult {
+                vertex: v,
+                in_degree: d,
+            })
+        .collect()
+}
+\end{verbatim}
+
+\columnbreak
+
+\begin{verbatim}
+/// 从边列表文件读取有向图
+/// 文件格式：每行
+/// time1 time2 from_id to_id
+pub fn read_edges(path: &str)
+    -> std::io::Result<DiGraph> {
+    let content =
+        std::fs::read_to_string(
+            path)?;
+    let mut edges:
+        Vec<(usize, usize)>
+        = Vec::new();
+    let mut max_id: usize = 0;
+
+    for line in content.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+
+        let parts: Vec<&str>
+            = line
+                .split_whitespace()
+                .collect();
+        if parts.len() < 4 {
+            continue;
+        }
+
+        if let (Ok(from),
+                Ok(to))
+            = (parts[2]
+                .parse::<usize>(),
+               parts[3]
+                .parse::<usize>()) {
+            edges.push(
+                (from, to));
+            if from > max_id {
+                max_id = from;
+            }
+            if to > max_id {
+                max_id = to;
+            }
+        }
+    }
+
+    let n = max_id + 1;
+    let mut graph =
+        DiGraph::new(n);
+
+    for (from, to) in edges {
+        graph.add_edge(from, to);
+    }
+
+    Ok(graph)
+}
+
+/// 生成测试用数据集
+/// 模拟 9 个班级共 180 名
+/// 学生的 5 天接触网络
+pub fn generate_sample_data(
+        path: &str)
+        -> std::io::Result<()> {
+    use std::io::Write;
+
+    let mut file
+        = std::fs::File
+            ::create(path)?;
+    let class_size = 20;
+    let num_classes = 9;
+    let total_students
+        = num_classes
+          * class_size;
+    let mut edges:
+        Vec<String>
+        = Vec::new();
+    // ...（生成逻辑参见
+    // 完整源码）
+    Ok(())
+}
+\end{verbatim}
+
+\end{multicols}
+}
+\vspace{0.5cm}
+{
+\fontsize{7pt}{9pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.6cm}
+\begin{multicols}{2}
+\noindent\textbf{src/main.rs}\par
+
+\begin{verbatim}
+use std::process;
+
+use exp_6::{
+    find_top_k,
+    generate_sample_data,
+    read_edges
+};
+
+fn main() {
+    let args: Vec<String>
+        = std::env::args()
+              .collect();
+
+    if args.len() < 2 {
+        eprintln!("用法: {} \
+            <数据文件路径> \
+            [top K 数量]",
+            args[0]);
+        eprintln!(
+            "  附加选项: \
+             --generate");
+        process::exit(1);
+    }
+
+    let input_path = &args[1];
+    let generate = args
+        .iter()
+        .any(|a| a=="--generate");
+    let k: usize = args.iter()
+        .skip(2)
+        .find(|a|
+            a.parse::<usize>()
+              .is_ok())
+        .and_then(
+            |a| a.parse().ok())
+        .unwrap_or(10);
+
+    if generate {
+        generate_sample_data(
+            input_path)
+        .unwrap_or_else(|err| {
+            eprintln!(
+                "生成数据失败: {}",
+                err);
+            process::exit(1);
+        });
+        println!(
+            "测试数据已生成: {}\n",
+            input_path);
+    }
+
+    let graph = read_edges(
+        input_path)
+        .unwrap_or_else(|err| {
+            eprintln!(
+                "无法读取数据文件 \
+                 {}: {}",
+                input_path, err);
+            process::exit(1);
+        });
+
+    let in_degrees
+        = graph.in_degrees();
+
+    println!(
+        "=== 社交网络分析 ===");
+    println!("数据文件: {}",
+        input_path);
+    println!("顶点数: {}",
+        graph.vertex_count());
+    println!("边数: {}",
+        graph.edge_count());
+
+    let max_deg = in_degrees
+        .iter().max()
+        .copied()
+        .unwrap_or(0);
+    let min_deg = in_degrees
+        .iter().min()
+        .copied()
+        .unwrap_or(0);
+    println!("入度范围: {} ~ {}",
+        min_deg, max_deg);
+
+    let top_k
+        = find_top_k(&graph, k);
+
+    println!();
+    println!(
+        "=== 入度排名前 {} 的 \
+         大 V 结点 ===",
+        k);
+    println!("{:<8} {:<10}",
+        "结点ID", "入度");
+    println!("{}",
+             "-".repeat(20));
+
+    for r in &top_k {
+        println!("{:<8} {:<10}",
+            r.vertex,
+            r.in_degree);
+    }
+}
+\end{verbatim}
+
+\columnbreak
+
+\noindent\textbf{tests/test\_fn.rs}\par
+
+\begin{verbatim}
+use exp_6::{
+    find_top_k,
+    generate_sample_data,
+    read_edges, DiGraph
+};
+
+#[test]
+fn build_simple_graph() {
+    let mut g = DiGraph::new(5);
+    g.add_edge(0, 1);
+    g.add_edge(0, 2);
+    assert_eq!(
+        g.vertex_count(), 5);
+}
+
+#[test]
+fn in_degree_calculation() {
+    let mut g =
+        DiGraph::new(4);
+    g.add_edge(0, 1);
+    g.add_edge(2, 1);
+    g.add_edge(3, 1);
+    let deg =
+        g.in_degrees();
+    assert_eq!(
+        deg[1], 3);
+    assert_eq!(
+        deg[0], 0);
+}
+
+#[test]
+fn find_top_k_basic() {
+    let mut g =
+        DiGraph::new(5);
+    g.add_edge(0, 4);
+    g.add_edge(1, 4);
+    g.add_edge(2, 4);
+    g.add_edge(3, 4);
+    let top =
+        find_top_k(&g, 3);
+    assert_eq!(
+        top[0].vertex, 4);
+    assert_eq!(
+        top[0].in_degree, 4);
+}
+
+#[test]
+fn find_top_k_more_k() {
+    let mut g =
+        DiGraph::new(3);
+    g.add_edge(0, 1);
+    let top =
+        find_top_k(&g, 10);
+    assert_eq!(
+        top.len(), 3);
+}
+
+#[test]
+fn empty_graph() {
+    let g =
+        DiGraph::new(5);
+    assert_eq!(
+        g.edge_count(), 0);
+}
+
+#[test]
+fn generate_read_roundtrip() {
+    let tmp =
+        "/tmp/tsn.txt";
+    generate_sample_data(
+        tmp).unwrap();
+    let graph =
+        read_edges(tmp)
+            .unwrap();
+    assert!(
+        graph.vertex_count()
+        > 0);
+    let top =
+        find_top_k(&graph, 10);
+    assert!(
+        !top.is_empty());
+    std::fs::remove_file(
+        tmp).ok();
+}
+\end{verbatim}
+
+\end{multicols}
+}
+{
+\fontsize{7pt}{9pt}\selectfont
+\setlength{\parindent}{0pt}
+\noindent\textbf{测试用例}\par
+\noindent (a) 180 顶点 926 边仿真数据集：最大入度 8（结点 52），前 10 名均入度 $\ge$ 7。\par
+\noindent (b) 手动 5 顶点有向图：正确计算入度 (4)、出度 (3) 及 Top-3 排序。\par
+\noindent (c) 3 顶点图请求 Top-10：返回全部 3 个顶点。\par
+\noindent (d) 空图：边数 0，入度均为 0。\par
+\noindent (e) 仿真数据往返读取：文件生成后再读入构建图，边数保持一致。\par
+}

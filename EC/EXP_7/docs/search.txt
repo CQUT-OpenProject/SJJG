@@ -1,0 +1,1 @@
+Search engines use inverted index to quickly find documents. The inverted index maps each word to the list of documents containing that word. This is a fundamental concept in information retrieval.

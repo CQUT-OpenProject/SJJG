@@ -1,0 +1,334 @@
+\clearpage
+\expchapter{实验一\quad 计算两篇文章的相似度}
+\sect{教学目标}
+\noindent\hspace*{2em}知识和能力目标：熟练掌握和应用线性表解决实际问题。价值目标：\par
+\noindent\hspace*{2em}科学精神：论文抄袭是一种非常严重的学术不端行为，我们不仅需要尊重他人的知识产权，同时也需要保护自己的知识产权，对自己的论文、报告、代码等各种学习成果加以保护。\par
+\noindent\hspace*{2em}人文素质：你在日常学习中如何保护自己的知识产权？你在日常学习中有哪些尊重他人知识产权的做法？\par
+\sect{问题描述}
+\noindent\hspace*{2em}文本相似度计算在信息检索、数据挖掘、机器翻译、文档复制检测等领域有着广泛的应用。例如网络舆情监控问题。假设你开发了一个微博网站，并且已经把世界上骂人的句子都收录进了数据库，那么当一个用户发微博时，最简单的办法就是将用户的微博文本与骂人句子数据库进行比较，判断其相似性，如果达到某种相似度，则用户的微博就不允许发出。\par
+\noindent\hspace*{2em}本问题的任务是：编写程序，计算任意两篇文章的相似度。假设如下：\par
+\noindent\hspace*{2em}文章是英文文章，每个单词之间有空格分隔。\par
+\noindent\hspace*{2em}文章长度不限，其中包含的英文单词数未知。\par
+\noindent\hspace*{2em}提供 3 种长度文章的测试结果：20 词左右，300 词左右，300 词以上\par
+\sect{基本思路}
+\noindent\hspace*{2em}判断文章相似度的策略很多，本任务请采用余弦相似度算法进行计算，具体描述如下。\par
+\noindent\hspace*{2em}一般来说，如果两篇文章的用词越相似，可以大致认为它们的内容越相似。对任意文本 A\textbackslash{}B，我们可以用余弦相似度来计算其相似度。具体描述如下。\par
+\noindent\hspace*{2em}文本 \textbf{A}： 我喜欢看电视，不喜欢看电影\par
+\noindent\hspace*{2em}文本 \textbf{B}： 我不喜欢看电影，也不喜欢看电视可以从词频入手计算文本 A 和 B 的相似度。\par
+\noindent\textbf{文本A 和 B 中包含如下词：}\par
+\noindent\hspace*{2em}文本 \textbf{A}：我 喜欢 看 电视 ， 不 喜欢 看 电影 。\par
+\noindent\hspace*{2em}文本 \textbf{B}：我 不 喜欢 看 电视 ， 也 不 喜欢 看 电影 。首先合并所有词：\par
+\noindent\hspace*{2em}我 喜欢 看 电视 电影 不 也然后计算每一篇文本的词频：\par
+\noindent\hspace*{2em}由此得到每一篇文章的词频向量\par
+\noindent\hspace*{2em}我们可以把这两个向量想象成 \textbf{7}\textbf{ }维空间中的两条线段\footnote{当然也可以把两篇文章看成是 7 维空间中的两个点。}，它们分别从原点（[0, 0, ...]）出发，指向\par
+\noindent\hspace*{2em}不同方向。两条线段之间形成一个夹角，如果夹角为 0 度，意味着方向相同、线段重合；如果夹角\par
+\noindent\hspace*{2em}为 90 度，意味着形成直角，方向完全不相似；如果夹角为 180 度，意味着方向正好相反。因此，我们可以通过夹角的大小，来判断向量的相似程度。夹角越小，就代表越相似。\par
+\begin{center}
+\includegraphics[width=0.28\textwidth]{images/exp1-1.png}
+\end{center}
+\noindent\hspace*{2em}假定 a 向量是[x1, y1]，b 向量是[x2, y2]，那么可将余弦定理改写成下面的形式：\par
+\begin{equation*}
+\cos\theta = \frac{x_{1}x_{2}+y_{1}y_{2}}{\sqrt{x_{1}^{2}+y_{1}^{2}}\,\times\,\sqrt{x_{2}^{2}+y_{2}^{2}}}
+\end{equation*}
+\noindent\hspace*{2em}余弦的这种计算方法对 n 维向量也成立。假定A 和B 是两个n 维向量，\par
+\noindent\hspace*{2em}A 是 [A1, A2, ..., An] ，B 是 [B1, B2, ..., Bn] ，则 A 与 B 的夹角 θ 的余弦等于：\par
+\begin{equation*}
+\begin{aligned}
+\cos\theta &= \frac{\sum\limits_{i=1}^{n}(A_{i}\times B_{i})}{\sqrt{\sum\limits_{i=1}^{n}(A_{i})^{2}}\,\times\,\sqrt{\sum\limits_{i=1}^{n}(B_{i})^{2}}} \\
+&= \frac{A\cdot B}{|A|\times|B|}
+\end{aligned}
+\end{equation*}
+\noindent\hspace*{2em}使用这个公式，我们就可以计算得到文本A 与文本 B 的余弦相似度如下：\par
+\begin{equation*}
+\begin{aligned}
+\cos\theta &= \frac{1\times 1+2\times 2+2\times 2+1\times 1+1\times 1+1\times 2+0\times 1}{\sqrt{1^{2}+2^{2}+2^{2}+1^{2}+1^{2}+1^{2}+0^{2}}\,\times\,\sqrt{1^{2}+2^{2}+2^{2}+1^{2}+1^{2}+2^{2}+1^{2}}} \\
+&= \frac{13}{\sqrt{12}\times\sqrt{16}} \\
+&\approx 0.938
+\end{aligned}
+\end{equation*}
+\sect{实验结果及分析}
+\noindent\hspace*{2em}1. 实验结果\par
+\noindent\hspace*{2em}（1）实验过程描述\par
+\noindent\hspace*{2em}1. 本实验用 Rust 语言开发，使用 Cargo 构建系统和 Rust 编译器（rustc），运行机器为本人笔记本电脑（macOS，Apple Silicon）。本人独立完成编码和测试，通过文档参考和示例代码分析确定了整体方案。\par
+\noindent\hspace*{2em}2. 选取三组英文文章：短文章组（约 20 词，讨论数据结构基础概念），中等文章组（约 300 词，分别讨论排序与查找算法），长文章组（超 300 词，分别讨论图与树算法）。共 6 篇文章。\par
+\noindent\hspace*{2em}3. 本实验的核心逻辑在于将两篇文章的单词映射到统一词表后，计算词频向量的余弦值。由于文章长度不限且单词数未知，程序需在运行时动态构建词表和词频向量，因此使用了堆上分配的 Vec 容器来存储词表和各词频分量。\par
+\noindent\hspace*{2em}（2）测试结果\par
+\noindent\hspace*{2em}三组测试数据运行本节所述的 cosin 相似度计算程序，得到如下结果：\par
+\begin{center}
+\fontsize{9pt}{12pt}\selectfont
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+测试组 & 文章 1 词数 & 文章 2 词数 & 合并词表大小 & 余弦相似度 \\ \hline
+短文章（约 20 词）  & 15 & 14 & 20 & 0.580948 \\ \hline
+中等文章（约 300 词）& 274 & 250 & 263 & 0.575394 \\ \hline
+长文章（300 词以上）& 608 & 690 & 493 & 0.648211 \\ \hline
+\end{tabular}
+\end{center}
+\noindent\hspace*{2em}将以上结果绘制为柱状图，如下所示：\par
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    width=0.75\textwidth,
+    height=5.5cm,
+    ymin=0, ymax=1.0,
+    ylabel={余弦相似度},
+    xtick=data,
+    xticklabels={短文章, 中等文章, 长文章},
+    bar width=1.5cm,
+    nodes near coords,
+    nodes near coords style={font=\fontsize{9pt}{11pt}\selectfont},
+    enlarge x limits=0.3,
+    grid=major,
+]
+\addplot coordinates {(1, 0.580948) (2, 0.575394) (3, 0.648211)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\figcaption{图 1\quad 三组文章对余弦相似度对比}
+\noindent\hspace*{2em}(1) 短文章与中等文章相似度均在 0.58 左右。短文章对共用核心术语（arrays、lists、stacks），中等文章对同属算法领域共享大量术语（algorithm、time、complexity、search 等），因此相似度接近。(2) 长文章对相似度达到 0.648，明显高于前两组。这两篇文章分别讨论图算法和树数据结构，虽属不同子领域，但共享了非常多的计算机科学通用术语（algorithm、vertex、node、edge、tree、graph、search、binary、computing 等），使得词频向量在高维空间中夹角较小。(3) 余弦相似度算法在词汇层面的比较效果明显，但无法感知语义和语序，这是词袋模型（Bag of Words）的固有局限。\par
+\noindent\hspace*{2em}2. 结果及方案分析\par
+\noindent\hspace*{2em}（1）本实验的重点及难点\par
+\noindent\hspace*{2em}核心是理解余弦相似度的数学原理并从二维推广到 n 维词频向量空间，以及正确构建统一词表和词频向量，确保两篇文章使用相同的维度编号以保证点积运算的正确性。\par
+\noindent\hspace*{2em}本实验的难点在于：文章长度不限、单词数未知的条件下，程序需动态构建词表和词频向量，不能用固定大小数组；当两篇文章完全没有共同词汇或某篇文章为空时，需处理分母为 0 的边界情况使得程序稳健运行。\par
+\noindent\hspace*{2em}（2）本实验设计的优点及可以改进的方向\par
+\noindent\hspace*{2em}程序可接受任意长度英文文本并输出余弦相似度。(1) 词表采用去重后字典序排列，向量维度编号稳定可复现；(2) 空文本和全异文本返回 0 且不触发除零崩溃；(3) 程序通过命令行接受文件路径。\par
+\noindent\hspace*{2em}设计的可优化处包括：(1) 当前仅支持英文（按空格分词），如需支持中文需引入分词库；(2) 词表构建使用了 O(n²) 的线性查找，当词表很大时效率偏低，可改用哈希表达到均摊 O(1) 查找；(3) 未引入 TF-IDF 权重，高频但无意义的停用词（如 the、a、is）对相似度贡献较大，可能影响结果准确性。\par
+\noindent\hspace*{2em}3. 除余弦相似度外还有哪些文本相似度方法？\par
+\noindent\hspace*{2em}除余弦相似度外，常用的文本相似度计算方法还包括：\par
+\noindent\hspace*{2em}(1) \textbf{Jaccard 相似度}：定义为两集合交集与并集的大小之比，直观易懂，但未考虑词频信息。\par
+\noindent\hspace*{2em}(2) \textbf{编辑距离（Levenshtein 距离）}：计算将一个字符串转为另一个所需的最少编辑操作次数，适合短文本比较，但对长文章计算开销较大。\par
+\noindent\hspace*{2em}(3) \textbf{SimHash}：将文档映射为固定长度的二进制指纹，通过海明距离判断相似性，适合大规模网页去重场景。Google 即使用 SimHash 进行网页查重。\par
+\noindent\hspace*{2em}(4) \textbf{基于词向量的余弦相似度}：使用 Word2Vec、GloVe 等预训练词向量代替 TF 词频，将语义信息引入相似度计算。\par
+\noindent\hspace*{2em}(5) \textbf{BLEU}：常用于机器翻译领域，通过比较候选译文与参考译文的 n-gram 重合程度来评分。\par
+\noindent\hspace*{2em}(6) \textbf{潜在语义分析（LSA）}：通过奇异值分解（SVD）对词-文档矩阵降维，在低维隐语义空间中计算相似度。\par
+\noindent\hspace*{2em}对于查抄袭场景，Jaccard 和余弦相似度实现简单但容易被同义词替换、语序重排规避。实际系统应组合多种算法。算法可能将引用相同参考文献的正常论文误判为抄袭，需配合人工审核。\par
+\noindent\hspace*{2em}4. 附件：源程序代码\par
+\noindent\hspace*{2em}实验代码使用 Rust 语言编写，Cargo 构建。以下为全部源程序。\par
+{
+\fontsize{7.5pt}{10pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.8cm}
+\begin{multicols}{2}
+\noindent\textbf{src/lib.rs}\par
+
+\begin{verbatim}
+/// 按空白字符拆分为单词列表
+pub fn tokenize(text: &str) -> Vec<&str> {
+    text.split_whitespace().collect()
+}
+
+/// 合并两篇文章的单词到统一词表（按字典序排列）
+pub fn build_vocabulary<'a>(tokens1: &[&'a str],
+                             tokens2: &[&'a str]) 
+                             -> Vec<&'a str> {
+    let mut vocab: Vec<&str> = Vec::new();
+
+    for &w in tokens1.iter().chain(tokens2) {
+        if !vocab.contains(&w) {
+            vocab.push(w);
+        }
+    }
+
+    vocab.sort();
+    vocab
+}
+
+/// 按统一词表计算词频向量
+pub fn word_frequency(tokens: &[&str],
+                      vocab: &[&str]) -> Vec<f64> {
+    let mut freq = vec![0.0_f64; vocab.len()];
+
+    for &token in tokens {
+        if let Some(idx) = 
+               vocab.iter().position(|&v| v == token) 
+        {
+            freq[idx] += 1.0;
+        }
+    }
+
+    freq
+}
+
+/// 向量点积
+pub fn dot_product(a: &[f64], b: &[f64]) -> f64 {
+    a.iter().zip(b.iter())
+        .map(|(x, y)| x * y).sum()
+}
+
+/// 向量模长（欧几里得范数）
+pub fn magnitude(v: &[f64]) -> f64 {
+    v.iter().map(|x| x * x).sum::<f64>().sqrt()
+}
+
+/// 余弦相似度，结果范围 [0, 1]
+/// 若任一向量模长为 0，返回 0.0
+pub fn cosine_similarity(a: &[f64],
+                         b: &[f64]) -> f64 {
+    let dot = dot_product(a, b);
+    let mag_a = magnitude(a);
+    let mag_b = magnitude(b);
+
+    if mag_a == 0.0 || mag_b == 0.0 {
+        0.0
+    } else {
+        dot / (mag_a * mag_b)
+    }
+}
+\end{verbatim}
+
+\columnbreak
+
+\noindent\textbf{src/main.rs}\par
+
+\begin{verbatim}
+use std::env;
+use std::fs;
+use std::process;
+
+use exp_1::{cosine_similarity,
+            build_vocabulary, tokenize,
+            word_frequency};
+
+fn main() {
+    let args: Vec<String> = env::args()
+                                .collect();
+
+    if args.len() < 3 {
+        eprintln!("用法: {} <文章1路径> \
+                   <文章2路径>", args[0]);
+        process::exit(1);
+    }
+
+    let text1 = fs::read_to_string(&args[1])
+        .unwrap_or_else(|err| {
+            eprintln!("无法读取文件 {}: {}",
+                      args[1], err);
+            process::exit(1);
+        });
+
+    let text2 = fs::read_to_string(&args[2])
+        .unwrap_or_else(|err| {
+            eprintln!("无法读取文件 {}: {}",
+                      args[2], err);
+            process::exit(1);
+        });
+
+    let tokens1 = tokenize(&text1);
+    let tokens2 = tokenize(&text2);
+
+    println!("文章1 单词数: {}",
+             tokens1.len());
+    println!("文章2 单词数: {}",
+             tokens2.len());
+
+    let vocab = build_vocabulary(&tokens1,
+                                 &tokens2);
+    println!("合并词表大小: {}",
+             vocab.len());
+
+    let vec1 = word_frequency(&tokens1,
+                              &vocab);
+    let vec2 = word_frequency(&tokens2,
+                              &vocab);
+
+    let similarity = cosine_similarity(&vec1,
+                                       &vec2);
+
+    println!("两篇文章相似度: {:.6}",
+             similarity);
+}
+\end{verbatim}
+
+\end{multicols}
+}
+\vspace{0.5cm}
+{
+\fontsize{7.5pt}{10pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.8cm}
+\begin{multicols}{2}
+\noindent\textbf{tests/test\_fn.rs}\par
+
+\begin{verbatim}
+use exp_1::{cosine_similarity,
+            build_vocabulary,
+            word_frequency, tokenize};
+
+fn similarity(text1: &str,
+              text2: &str) -> f64 {
+    let tokens1 = tokenize(text1);
+    let tokens2 = tokenize(text2);
+    let vocab = build_vocabulary(&tokens1,
+                                 &tokens2);
+    let vec1 = word_frequency(&tokens1,
+                              &vocab);
+    let vec2 = word_frequency(&tokens2,
+                              &vocab);
+    cosine_similarity(&vec1, &vec2)
+}
+
+#[test]
+fn identical_text() {
+    let text = "hello world hello";
+    let sim = similarity(text, text);
+    assert!((sim - 1.0).abs() < 1e-9);
+}
+
+#[test]
+fn completely_different() {
+    let text1 = "apple banana orange";
+    let text2 = "dog cat bird fish";
+    let sim = similarity(text1, text2);
+    assert!((sim - 0.0).abs() < 1e-9);
+}
+
+#[test]
+fn partial_overlap() {
+    let text1 = "apple banana orange pear";
+    let text2 = "orange banana grape apple";
+    // dot=3, |a|=2, |b|=2 => cos=0.75
+    let sim = similarity(text1, text2);
+    assert!((sim - 0.75).abs() < 1e-9);
+}
+
+#[test]
+fn empty_text() {
+    let sim = similarity(
+        "",
+        "hello world"
+    );
+    assert!((sim - 0.0).abs() < 1e-9);
+}
+
+#[test]
+fn both_empty() {
+    let sim = similarity("", "");
+    assert!((sim - 0.0).abs() < 1e-9);
+}
+
+#[test]
+fn known_repeated_words() {
+    let text1 = "a a b b c c d";
+    let text2 = "a a b b b c d d";
+    let sim = similarity(text1, text2);
+    let expected = 14.0
+        / (13.0_f64.sqrt()
+           * 18.0_f64.sqrt());
+    assert!((sim - expected).abs() < 1e-9);
+}
+\end{verbatim}
+
+\end{multicols}
+}
+{
+\fontsize{7.5pt}{10pt}\selectfont
+\setlength{\parindent}{0pt}
+\noindent\textbf{测试语料}\par
+\noindent 短文章对：short\_1.txt（15 词）与 short\_2.txt（14 词），主题涉及数据结构基础概念。\par
+\noindent 中等文章对：medium\_1.txt（274 词）与 medium\_2.txt（250 词），分别介绍排序算法与查找算法。\par
+\noindent 长文章对：long\_1.txt（608 词）与 long\_2.txt（690 词），分别讨论图算法与树数据结构。\par
+}
+
+\clearpage

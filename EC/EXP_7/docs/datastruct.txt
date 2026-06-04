@@ -1,0 +1,1 @@
+Data structures are fundamental to computer science. Arrays, linked lists, stacks, and queues are basic data structures. Trees and graphs are more advanced data structures.

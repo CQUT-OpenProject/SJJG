@@ -1,0 +1,83 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[top=2.45cm,bottom=2.15cm,left=2.65cm,right=2.65cm,headheight=18pt,headsep=0.55cm]{geometry}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{multirow}
+\usepackage{diagbox}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{tocloft}
+\usepackage{multicol}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\newcommand{\SongtiName}{Songti SC}
+\IfFontExistsTF{Songti SC}{\renewcommand{\SongtiName}{Songti SC}}{%
+  \IfFontExistsTF{STSong}{\renewcommand{\SongtiName}{STSong}}{%
+    \IfFontExistsTF{SimSun}{\renewcommand{\SongtiName}{SimSun}}{\renewcommand{\SongtiName}{Noto Serif CJK SC}}}}
+
+\setmainfont{\SongtiName}
+\setCJKmainfont[AutoFakeBold=2.4]{\SongtiName}
+\setCJKsansfont[AutoFakeBold=2.4]{\SongtiName}
+\IfFontExistsTF{Menlo}{\setmonofont{Menlo}[Scale=MatchLowercase]}{\setmonofont{Latin Modern Mono}[Scale=MatchLowercase]}
+\XeTeXlinebreaklocale "zh"
+\XeTeXlinebreakskip = 0pt plus 1pt
+\hypersetup{hidelinks}
+
+\definecolor{lightgray}{RGB}{218,218,218}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\fontsize{10.5pt}{13pt}\selectfont 重庆理工大学}
+\fancyhead[R]{\fontsize{10.5pt}{13pt}\selectfont 《数据结构》实验案例}
+\renewcommand{\headrulewidth}{0.55pt}
+\fancyfoot[C]{\fontsize{10.5pt}{13pt}\selectfont\thepage}
+
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\renewcommand{\baselinestretch}{1.0}
+\setcounter{tocdepth}{2}
+\renewcommand{\contentsname}{目录}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftsecindent}{0pt}
+\setlength{\cftsubsecindent}{1.35cm}
+\setlength{\cftsecnumwidth}{0pt}
+\setlength{\cftsubsecnumwidth}{0pt}
+\setlength{\cftbeforesecskip}{0.1cm}
+\setlength{\cftbeforesubsecskip}{-0.1cm}
+\renewcommand{\cftsecfont}{\fontsize{10.5pt}{12pt}\selectfont\bfseries}
+\renewcommand{\cftsecpagefont}{\fontsize{10.5pt}{12pt}\selectfont\bfseries}
+\renewcommand{\cftsubsecfont}{\fontsize{9.5pt}{10pt}\selectfont}
+\renewcommand{\cftsubsecpagefont}{\fontsize{9.5pt}{10pt}\selectfont}
+
+\newcommand{\blankline}{\rule{2.45cm}{0.4pt}}
+\newcommand{\expchapter}[1]{%
+  \phantomsection\addcontentsline{toc}{section}{#1}%
+  \begin{center}{\fontsize{16pt}{24pt}\selectfont\bfseries #1}\end{center}}
+\newcommand{\sect}[1]{%
+  \phantomsection\addcontentsline{toc}{subsection}{【#1】}%
+  \vspace{0.15cm}\noindent{\bfseries【#1】}\par}
+\newcommand{\figcaption}[1]{%
+  \begin{center}{\fontsize{9.5pt}{12pt}\selectfont #1}\end{center}}
+\makeatletter
+\newcommand{\makerealtoc}{%
+  \thispagestyle{fancy}%
+  \vspace*{-0.9cm}%
+  \begin{center}
+    {\fontsize{18pt}{28pt}\selectfont\bfseries 目录}
+  \end{center}
+  \vspace{0.15cm}
+  \@starttoc{toc}
+}
+\makeatother

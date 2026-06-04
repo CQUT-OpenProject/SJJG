@@ -1,0 +1,594 @@
+\clearpage
+\expchapter{实验三\quad 操作系统的时间片轮转调度算法}
+\sect{教学目标}
+\noindent\hspace*{2em}关键词：队列，分时操作系统，时间片轮转调度算法\par
+\noindent\hspace*{2em}知识和能力目标：熟练掌握队列的存储及其操作方法，理解队列适用的问题场景。价值目标：\par
+\noindent\hspace*{2em}职业素养（工程与社会）：计算机系统的设计与实施，是一个系统工程，或者说，它就是一个工程问题。工程师在解决问题时，总是需要在资源使用和资源保护方面寻找平衡点。时间片轮转调度算法很有意思，你可能会发现，虽然时间片的大小、进程的执行时间等因素间存在强相关性，但为了获得良好的带权周转时间，却很难有一个标准答案，需要我们权衡多种因素，按需进行设计和选择。作为未来的计算机工程师，你在处理实际问题时，应该对此有充分的认知和心理准备。\par
+\noindent\hspace*{2em}人文素质：你认为作为计算机工程师，我们工作中的美学体现在哪些方面？\par
+\sect{问题描述}
+\noindent\hspace*{2em}操作系统（Operating System，OS）是管理计算机硬件与软件资源的程序，是计算机系统的内核与基石。操作系统需要管理内存、决定系统资源供需的优先次序、控制输入与输出设备、操作网络、管理文件系统等，操作系统也提供一个让用户与系统交互的界面。\par
+\noindent\hspace*{2em}分时操作系统（Time-sharing operating System）是指在一台主机上连接了多个带有显示器和键盘等设备的终端，允许多个用户同时通过自己的终端以交互方式共享使用计算机的系统。在分时操作系统管理下，终端用户通过各自的终端向系统发出命令请求，系统采用时间片轮转法的方式，来接收每个用户的命令并处理服务请求，同时通过交互方式在终端上向用户显示处理的结果。即系统将 CPU 的执行时间分割为一个个时间段（称为时间片），然后轮流分配给每个用户使用，每个用户程序每次只能在 CPU 上运行一个时间片。由于时间间隔很短，每个用户感觉自己独占了计算机。Unix 和 Linux 是典型的分时操作系统。\par
+\begin{center}
+\includegraphics[width=0.6\textwidth]{images/exp3-1.png}
+\end{center}
+\noindent\hspace*{2em}本问题的任务是：编写程序，模拟实现分时操作系统的时间片轮转调度算法。\par
+\sect{基本思路}
+\noindent\hspace*{2em}时间片轮转（Round Robin，RR）调度算法：为分时操作系统设计。在绪的时间片轮转法中，系统将所有就绪进程按先来先服务的原则排成一个队列。每次调度时，把 CPU 分配给队首进程，并令其执行一个时间片。时间片\footnote{在时间片轮转算法中，时间片的大小对系统性能有很大影响。很小的时间片有利于短作业，因为它能较快地切换，但会频繁地发生中断、进程切换，从而增加系统开销。如时间片太长，使每个进程都能在一个时间片内完成，时间片轮转算法便退化为 FCFS 算法，无法满足交互式用户的需求。}的大小从几 ms 到几百 ms。当执行的时间片用完时，由一个计时器发出时钟中断，调度程序据此信号来停止该进程，并将它送往就绪队列的末尾；然后再把处理机分配给就绪队列中新的队首进程，也让它执行一个时间片。如此反复，就可以保证就绪队列中的所有进程在一个给定的时间段内均能获得若干时间片的处理机执行时间。也即，操作系统能在给定时间段内响应所有用户的请求。\par
+\noindent\hspace*{2em}\textbf{RR 算法思路：}\par
+\noindent\hspace*{2em}Step1：将需要运行的进程依次放入就绪队列 Q\par
+\noindent\hspace*{2em}Step2：如果 Q 为空，则 return；否则，从 Q 出队一个进程，让其运行一个时间片的时间。如进程在一个时间未执行完，则其去 Q 末尾重新排队，等待下一次调度。\par
+\noindent\hspace*{2em}Step3：转 Step2\par
+\noindent\hspace*{2em}\textbf{【例】}进程 A、B、C、D 需运行的时间分别为 20ms、10 ms、15 ms、5 ms，均在 0 时刻到达。到达次序为 A、B、C、D。如果时间片分别为 1 ms 和 5ms，计算各进程的带权周转时间和平均带权周转时间。分析：根据 RR 算法，图 4.1 表示了进程执行情况。\par
+\begin{center}
+\includegraphics[width=0.95\textwidth]{images/exp3-2.png}
+\end{center}
+\noindent\hspace*{2em}进程 i 的带权周转时间：$w_i = T_i / R_i$，其中 $T_i$ 为周转时间，$R_i$ 为实际运行时间。\par
+\noindent\hspace*{2em}所有进程的平均带权周转时间：$W = \left(\sum_{i=1}^{n} w_i\right) \times \frac{1}{n} = \left(\sum_{i=1}^{n} T_i / R_i\right) \times \frac{1}{n}$\par
+\noindent\hspace*{2em}RR 算法的性能指标如下（以下除带权周转时间外，其余时间单位均为 ms）：\par
+\sect{实验结果及分析}
+\noindent\hspace*{2em}1. 实验结果\par
+\noindent\hspace*{2em}（1）实验过程描述\par
+\noindent\hspace*{2em}1. 本实验用 Rust 语言开发，使用 Cargo 构建系统和 rustc 编译器，运行机器为本人笔记本电脑（macOS，Apple Silicon）。本人独立完成编码和测试，参考相关算法资料关于 RR 调度的描述实现了循环顺序队列和 RR 调度器。\par
+\noindent\hspace*{2em}2. 测试数据选取思路为：典型、覆盖不同时间片大小、覆盖进程到达时间差异。重点测试包括：(a) 经典例题 4 进程同 0 时刻到达，时间片 = 5；(b) 同样 4 进程同 0 时刻到达，时间片 = 1；(c) 时间片远大于所有进程服务时间（验证大时间片退化为 FCFS）；(d) 首个进程晚于 0 时刻到达、输入进程未按到达时间排序、时间片为 0 等边界情况。\par
+\noindent\hspace*{2em}3. 经典例题 4 进程在两种时间片下的周转时间是测试重点。因为这是相关资料中给出的标准答案，便于对照验证程序正确性。\par
+\noindent\hspace*{2em}（2）测试结果\par
+\noindent\hspace*{2em}运行实验程序对经典例题的两种时间片进行 RR 调度，得到如下甘特图：\par
+\noindent\hspace*{2em}\textbf{时间片 = 5 时}：\par
+\begin{center}
+\fontsize{8.5pt}{11pt}\selectfont
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+时间区间 & [0,5) & [5,10) & [10,15) & [15,20) & [20,25) & [25,30) & [30,35) & [35,40) & [40,45) & [45,50) \\ \hline
+进程 & A & B & C & D & A & B & C & A & C & A \\ \hline
+\end{tabular}
+\end{center}
+\noindent\hspace*{2em}\textbf{时间片 = 1 时}：共 50 个时间片片段（篇幅所限，仅列前 10 段与后 10 段）：\par
+\begin{center}
+\fontsize{8pt}{11pt}\selectfont
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+时间区间 & [0,1) & [1,2) & [2,3) & [3,4) & [4,5) & [5,6) & [6,7) & [7,8) & [8,9) & [9,10) \\ \hline
+进程 & A & B & C & D & A & B & C & D & A & B \\ \hline
+\end{tabular}\\[2pt]
+\fontsize{8pt}{11pt}\selectfont
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+时间区间 & [40,41) & [41,42) & [42,43) & [43,44) & [44,45) & [45,46) & [46,47) & [47,48) & [48,49) & [49,50) \\ \hline
+进程 & C & A & C & A & C & A & A & A & A & A \\ \hline
+\end{tabular}
+\end{center}
+\noindent\hspace*{2em}各进程的完成时间与带权周转时间统计：\par
+\begin{center}
+\fontsize{9pt}{12pt}\selectfont
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{\textbf{时间片}} & \multirow{2}{*}{\textbf{进程名}} & \multicolumn{6}{c|}{\textbf{性能指标}} \\ \cline{3-8}
+ & & 到达时间 & 运行时间 & 开始时间 & 完成时间 & 周转时间 & 带权周转时间 \\ \hline
+\multirow{4}{*}{5} & A & 0 & 20 & 0 & 50 & 50 & 2.5 \\ \cline{2-8}
+ & B & 0 & 10 & 5 & 30 & 30 & 3.0 \\ \cline{2-8}
+ & C & 0 & 15 & 10 & 45 & 45 & 3.0 \\ \cline{2-8}
+ & D & 0 & 5 & 15 & 20 & 20 & 4.0 \\ \hline
+\multicolumn{7}{|r|}{平均周转时间 = 36.25\quad 平均带权周转时间 = 3.125} & \\ \hline
+\multirow{4}{*}{1} & A & 0 & 20 & 0 & 50 & 50 & 2.5 \\ \cline{2-8}
+ & B & 0 & 10 & 1 & 34 & 34 & 3.4 \\ \cline{2-8}
+ & C & 0 & 15 & 2 & 45 & 45 & 3.0 \\ \cline{2-8}
+ & D & 0 & 5 & 3 & 20 & 20 & 4.0 \\ \hline
+\multicolumn{7}{|r|}{平均周转时间 = 37.25\quad 平均带权周转时间 = 3.225} & \\ \hline
+\end{tabular}
+\end{center}
+\noindent\hspace*{2em}将两种时间片下的关键指标绘制为分组柱状图：\par
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    width=0.95\textwidth,
+    height=6.0cm,
+    ymin=0, ymax=5.5,
+    ylabel={值},
+    symbolic x coords={A,B,C,D,平均},
+    xtick=data,
+    bar width=0.7cm,
+    nodes near coords,
+    nodes near coords style={font=\fontsize{7.5pt}{9pt}\selectfont},
+    enlarge x limits=0.2,
+    legend pos=outer north east,
+    legend style={font=\fontsize{8pt}{10pt}\selectfont},
+    ymajorgrids=true,
+    grid=major,
+]
+\addplot[fill=blue!60] coordinates {
+    (A,2.5)(B,3.0)(C,3.0)(D,4.0)(平均,3.125)
+};
+\addlegendentry{时间片 = 5}
+\addplot[fill=red!60] coordinates {
+    (A,2.5)(B,3.4)(C,3.0)(D,4.0)(平均,3.225)
+};
+\addlegendentry{时间片 = 1}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\noindent\hspace*{2em}由以上结果可知：(1) 两种时间片下，A 和 D 的带权周转时间均相同（分别为 2.5 和 4.0），因为 A 和 D 的服务时间恰好都是时间片 5 的整数倍（20=4$\times$5，5=1$\times$5），调度时没有"被切碎"造成的额外等待。(2) 进程 B 的带权周转时间从 3.0（时间片 5）上升到 3.4（时间片 1），是因为时间片 1 时 B 总共被切为 10 段执行，每段之间都要等待 CPU 转给其他进程，周转时间从 30 增加到 34。(3) 进程 C 的带权周转时间在两种时间片下都保持 3.0，原因是 15/15 始终成立。(4) 总体平均带权周转时间从 3.125 上升到 3.225，说明时间片过小会引入频繁切换的开销。\par
+\noindent\hspace*{2em}2. 结果及方案分析\par
+\noindent\hspace*{2em}（1）本实验的重点及难点\par
+\noindent\hspace*{2em}核心是理解 RR 调度"先来先服务 + 时间片到则轮换"，使用循环顺序队列作为就绪队列，正确维护进程的剩余时间和首次开始/完成时间三项状态。\par
+\noindent\hspace*{2em}进程可分多次执行，首次入队时记录 first\_start 后不可覆盖；队首进程一次执行可能跨多个时间片，据此决定是否重新入队；队列为空但还有未到达进程时需将时钟快进到下一进程到达时间。\par
+\noindent\hspace*{2em}（2）本实验设计的优点及可以改进的方向\par
+\noindent\hspace*{2em}程序可处理任意到达时间和服务时间的进程集合。就绪队列用循环顺序队列实现。进程状态封装在 Process 结构体内。调度前自动按到达时间排序。支持任意规模和时间片大小，对边界情况均有单元测试。\par
+\noindent\hspace*{2em}设计的可优化处包括：(1) 当前时间片为 0 时直接拒绝运行，后续可改为返回 Result 类型，使错误处理更温和；(2) 队列使用 Vec<Option<T>> 数组实现，每次操作涉及取地址，若对性能要求高可改用裸指针或 UnsafeCell；(3) 可视化仅在终端输出甘特图文本，可拓展为图形化（SVG/PNG）输出。\par
+\noindent\hspace*{2em}3. 时间片轮转调度的工程应用与启示。\par
+\noindent\hspace*{2em}RR 调度按时间片轮换的思想在工程中广泛使用。Unix 分时系统、TDMA 无线通信均采用类似机制。当简单算法指标不足时，可组合优先级或多级反馈队列优化。RR 的核心——将稀缺资源切分为可抢占份额并公平轮流分配——在协作办公软件的多人编辑、医院的医生排班等非计算机领域同样适用。面对问题时，先用最简单的方案再迭代优化，往往比直接追求复杂算法更为务实。\par
+\noindent\hspace*{2em}4. 附件：源程序代码\par
+\noindent\hspace*{2em}实验代码使用 Rust 语言编写，Cargo 构建。整个工程分为三个源文件：queue.rs 实现循环顺序队列，process.rs 定义进程结构体，lib.rs 实现 RR 调度算法。\par
+{
+\fontsize{7.5pt}{10pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.6cm}
+\begin{multicols}{2}
+\noindent\textbf{src/queue.rs}\par
+
+\begin{verbatim}
+/// 循环顺序队列
+/// 通过牺牲一个存储单元来区分
+/// 队空与队满
+pub struct Queue<T> {
+    data: Vec<Option<T>>,
+    head: usize,
+    tail: usize,
+    cap: usize,
+}
+
+impl<T> Queue<T> {
+    pub fn new(
+        capacity: usize) -> Self {
+        Queue {
+            data: (0..=capacity)
+                .map(|_| None).collect(),
+            head: 0, tail: 0,
+            cap: capacity,
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.head == self.tail
+    }
+
+    pub fn is_full(&self) -> bool {
+        (self.tail + 1)
+            % (self.cap + 1)
+            == self.head
+    }
+
+    pub fn enqueue(
+        &mut self, val: T) -> bool {
+        if self.is_full() {
+            return false;
+        }
+        self.data[self.tail] =
+            Some(val);
+        self.tail =
+            (self.tail + 1)
+            % (self.cap + 1);
+        true
+    }
+
+    pub fn dequeue(
+        &mut self) -> Option<T> {
+        if self.is_empty() {
+            return None;
+        }
+        let v = self.data[
+            self.head].take();
+        self.head =
+            (self.head + 1)
+            % (self.cap + 1);
+        v
+    }
+}
+\end{verbatim}
+
+\columnbreak
+
+\noindent\textbf{src/process.rs}\par
+
+\begin{verbatim}
+#[derive(Clone, Debug)]
+pub struct Process {
+    pub name: String,
+    pub arrival: u32,
+    pub total: u32,
+    pub remaining: u32,
+    pub first_start: Option<u32>,
+    pub finish: Option<u32>,
+}
+
+impl Process {
+    pub fn new(
+        name: &str,
+        arrival: u32,
+        total: u32) -> Self {
+        Process {
+            name: name.to_string(),
+            arrival, total,
+            remaining: total,
+            first_start: None,
+            finish: None,
+        }
+    }
+
+    pub fn turnaround(&self)
+        -> u32 {
+        self.finish.unwrap_or(0)
+            .saturating_sub(
+                self.arrival)
+    }
+
+    pub fn weighted_turnaround(
+        &self) -> f64 {
+        let t =
+            self.turnaround()
+            as f64;
+        t / self.total as f64
+    }
+}
+\end{verbatim}
+
+\noindent\textbf{src/lib.rs}\par
+
+\begin{verbatim}
+pub mod process;
+pub mod queue;
+
+use crate::process::Process;
+use crate::queue::Queue;
+
+#[derive(Clone, Debug)]
+pub struct Slice {
+    pub name: String,
+    pub start: u32,
+    pub end: u32,
+}
+
+pub struct ScheduleResult {
+    pub slices: Vec<Slice>,
+    pub processes: Vec<Process>,
+}
+
+pub fn round_robin(
+        input: Vec<Process>,
+        quantum: u32)
+        -> ScheduleResult {
+    assert!(quantum > 0,
+            "时间片必须大于 0");
+    let n = input.len();
+    let mut q: Queue<usize> =
+        Queue::new(n + 4);
+    let mut procs = input;
+    procs.sort_by_key(|p| p.arrival);
+    let mut slices
+        : Vec<Slice> = Vec::new();
+    let mut now: u32 = 0;
+    let mut i: usize = 0;
+    let mut finished: usize = 0;
+
+    if n == 0 {
+        return ScheduleResult {
+            slices, processes: procs
+        };
+    }
+
+    if procs[0].arrival > now {
+        now = procs[0].arrival;
+    }
+
+    while i < n
+          && procs[i].arrival <= now {
+        q.enqueue(i);
+        i += 1;
+    }
+
+    while !q.is_empty() {
+        let idx = q.dequeue().unwrap();
+        let start = now;
+
+        if procs[idx]
+            .first_start.is_none() {
+            procs[idx].first_start =
+                Some(start);
+        }
+
+        if procs[idx]
+            .remaining <= quantum {
+            now += procs[idx]
+                .remaining;
+            procs[idx].remaining = 0;
+            procs[idx].finish =
+                Some(now);
+            finished += 1;
+        } else {
+            now += quantum;
+            procs[idx]
+                .remaining -= quantum;
+        }
+
+        slices.push(Slice {
+            name: procs[idx]
+                .name.clone(),
+            start, end: now,
+        });
+
+        while i < n
+              && procs[i].arrival
+                 <= now {
+            q.enqueue(i);
+            i += 1;
+        }
+
+        if procs[idx]
+            .remaining > 0 {
+            q.enqueue(idx);
+        }
+
+        if q.is_empty()
+           && finished < n {
+            now = procs[i].arrival;
+            while i < n
+                  && procs[i].arrival
+                     <= now {
+                q.enqueue(i);
+                i += 1;
+            }
+        }
+    }
+
+    ScheduleResult {
+        slices, processes: procs
+    }
+}
+
+pub fn averages(
+        result: &ScheduleResult)
+        -> (f64, f64) {
+    let n = result
+        .processes.len() as f64;
+    let sum_t: f64 = result
+        .processes.iter()
+        .map(|p| p.turnaround()
+            as f64).sum();
+    let sum_w: f64 = result
+        .processes.iter()
+        .map(|p| p
+            .weighted_turnaround())
+        .sum();
+    (sum_t / n, sum_w / n)
+}
+\end{verbatim}
+
+\end{multicols}
+}
+\vspace{0.5cm}
+{
+\fontsize{7.5pt}{10pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.6cm}
+\begin{multicols}{2}
+\noindent\textbf{src/main.rs}\par
+
+\begin{verbatim}
+use exp_3::{
+    averages,
+    process::Process,
+    round_robin
+};
+
+fn run_case(
+        label: &str,
+        processes: Vec<Process>,
+        quantum: u32) {
+    let result = round_robin(
+        processes, quantum);
+    let (avg_t, avg_w) =
+        averages(&result);
+
+    println!(
+        "\n== {} ==", label);
+    for s in &result.slices {
+        println!(
+            "  [{},{})  {}",
+            s.start, s.end, s.name);
+    }
+    for p in &result.processes {
+        println!(
+            "  {}: 完成={}, \
+             周转={}, 带权={:.3}",
+            p.name,
+            p.finish.unwrap(),
+            p.turnaround(),
+            p.weighted_turnaround());
+    }
+    println!(
+        "  平均周转={:.3} \
+         平均带权={:.3}",
+        avg_t, avg_w);
+}
+
+fn main() {
+    let procs = vec![
+        Process::new("A",0,20),
+        Process::new("B",0,10),
+        Process::new("C",0,15),
+        Process::new("D",0, 5),
+    ];
+    run_case("时间片 = 5",
+        procs.clone(), 5);
+    run_case("时间片 = 1",
+        procs, 1);
+}
+\end{verbatim}
+
+\columnbreak
+
+\noindent\textbf{tests/test\_fn.rs}\par
+
+\begin{verbatim}
+use exp_3::{
+    averages,
+    process::Process,
+    round_robin
+};
+
+fn classic_four()
+    -> Vec<Process> {
+    vec![
+        Process::new("A",0,20),
+        Process::new("B",0,10),
+        Process::new("C",0,15),
+        Process::new("D",0, 5),
+    ]
+}
+
+#[test]
+fn quantum_5_textbook() {
+    let r = round_robin(
+        classic_four(), 5);
+    let by = |n: &str| r.processes
+        .iter()
+        .find(|p| p.name==n)
+        .unwrap()
+        .finish.unwrap();
+    assert_eq!(by("A"), 50);
+    assert_eq!(by("B"), 30);
+    assert_eq!(by("C"), 45);
+    assert_eq!(by("D"), 20);
+    let (t, w) = averages(&r);
+    assert!(
+        (t - 36.25).abs()<1e-9);
+    assert!(
+        (w - 3.125).abs()<1e-9);
+}
+
+#[test]
+fn quantum_1_textbook() {
+    let r = round_robin(
+        classic_four(), 1);
+    let by = |n: &str| r.processes
+        .iter()
+        .find(|p| p.name==n)
+        .unwrap()
+        .finish.unwrap();
+    assert_eq!(by("A"), 50);
+    assert_eq!(by("B"), 34);
+    assert_eq!(by("C"), 45);
+    assert_eq!(by("D"), 20);
+    let (t, w) = averages(&r);
+    assert!(
+        (t - 37.25).abs()<1e-9);
+    assert!(
+        (w - 3.225).abs()<1e-9);
+}
+
+#[test]
+fn total_runtime() {
+    let r = round_robin(
+        classic_four(), 3);
+    let total: u32 = r
+        .processes.iter()
+        .map(|p| p.total).sum();
+    let makespan = r
+        .processes.iter()
+        .map(|p| p.finish
+            .unwrap())
+        .max().unwrap();
+    assert_eq!(makespan, total);
+}
+
+#[test]
+fn staggered() {
+    // A 0/5, B 3/2, q=2
+    // [0,2)A [2,4)A [4,6)B [6,7)A
+    let procs = vec![
+        Process::new("A",0,5),
+        Process::new("B",3,2),
+    ];
+    let r = round_robin(
+        procs, 2);
+    let by = |n: &str| r
+        .processes.iter()
+        .find(|p| p.name==n)
+        .unwrap()
+        .finish.unwrap();
+    assert_eq!(by("A"), 7);
+    assert_eq!(by("B"), 6);
+}
+
+#[test]
+fn quantum_huge_fcfs() {
+    let procs = vec![
+        Process::new("X",0,3),
+        Process::new("Y",0,4),
+    ];
+    let r = round_robin(
+        procs, 100);
+    let by = |n: &str| r
+        .processes.iter()
+        .find(|p| p.name==n)
+        .unwrap()
+        .finish.unwrap();
+    assert_eq!(by("X"), 3);
+    assert_eq!(by("Y"), 7);
+}
+
+#[test]
+fn first_process_after_zero() {
+    let procs = vec![
+        Process::new("A",5,3),
+    ];
+    let r = round_robin(procs, 2);
+    assert_eq!(r.slices[0].start, 5);
+    assert_eq!(
+        r.processes[0].finish,
+        Some(8));
+}
+
+#[test]
+fn input_sorted_by_arrival() {
+    let procs = vec![
+        Process::new("B",3,2),
+        Process::new("A",0,5),
+    ];
+    let r = round_robin(procs, 2);
+    let by = |n: &str| r
+        .processes.iter()
+        .find(|p| p.name==n)
+        .unwrap()
+        .finish.unwrap();
+    assert_eq!(by("A"), 7);
+    assert_eq!(by("B"), 6);
+}
+
+#[test]
+#[should_panic]
+fn quantum_zero_invalid() {
+    let _ = round_robin(
+        classic_four(), 0);
+}
+\end{verbatim}
+
+\end{multicols}
+}
+{
+\fontsize{7.5pt}{10pt}\selectfont
+\setlength{\parindent}{0pt}
+\noindent\textbf{测试用例}\par
+\noindent (a) 经典例题 4 进程，时间片 = 5：完成时间 A=50/B=30/C=45/D=20，平均周转 36.25，平均带权 3.125。\par
+\noindent (b) 经典例题 4 进程，时间片 = 1：完成时间 A=50/B=34/C=45/D=20，平均周转 37.25，平均带权 3.225。\par
+\noindent (c) 时间片 = 3：makespan = 20+10+15+5 = 50，与总服务时间相等。\par
+\noindent (d) 错峰到达：A(0,5)+B(3,2)，q=2：A 完成于 7，B 完成于 6。\par
+\noindent (e) 大时间片退化：q=100 退化为 FCFS，X(0,3) 完成 3，Y(0,4) 完成 7。\par
+\noindent (f) 首个进程晚到：A(5,3)，q=2，从 5 时刻开始执行，8 时刻完成。\par
+\noindent (g) 输入乱序：先传入 B(3,2)，再传入 A(0,5)，程序自动按到达时间排序，结果与正确顺序一致。\par
+\noindent (h) 时间片为 0：程序拒绝运行，避免调度循环无法推进。\par
+}
+

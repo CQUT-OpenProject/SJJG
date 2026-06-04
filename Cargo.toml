@@ -1,5 +1,13 @@
 [workspace]
 members = [
+    "EC/EXP_1",
+    "EC/EXP_2",
+    "EC/EXP_3",
+    "EC/EXP_4",
+    "EC/EXP_5",
+    "EC/EXP_6",
+    "EC/EXP_7",
+    "EC/EXP_8",
     "EXP/EXP_1/ex_1",
     "EXP/EXP_1/ex_2",
     "EXP/EXP_1/ex_3",

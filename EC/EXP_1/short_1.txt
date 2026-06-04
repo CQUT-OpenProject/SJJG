@@ -1,0 +1,1 @@
+data structures are fundamental concepts in computer science programs students learn arrays lists and stacks

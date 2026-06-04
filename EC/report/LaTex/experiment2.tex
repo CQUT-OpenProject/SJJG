@@ -1,0 +1,575 @@
+\expchapter{实验二\quad 中国地图四染色问题}
+\sect{教学目标}
+\noindent\hspace*{2em}知识和能力目标：熟练掌握和应用栈结构解决实际问题，本例主要是从递归算法到非递归算法的问题。\par
+\noindent\hspace*{2em}价值目标：\par
+\noindent\hspace*{2em}科学精神：希望你了解四色定理的产生及研究历程，理解科学研究的严谨性、长期性及其对人类社会发展的深远影响。\par
+\noindent\hspace*{2em}人文素质：你是否知道什么是飞地？\par
+\sect{问题描述}
+\noindent\hspace*{2em}四色问题又称四色猜想、四色定理，是世界近代三大数学难题之一。1852 年毕业于伦敦大学的佛朗西斯·格斯里（Francis Guthrie）在一家科研单位进行地图着色工作时，发现了一个有趣现象：每幅地图都可以只用四种颜色着色，就能使有共同边界的国家都着上不同颜色（不含飞地\footnote{飞地，是一种特殊的人文地理现象，指隶属于某一行政区管辖但不与本区毗连的土地。}）。那么，这是一个因地图不够复杂的巧合？还是一个确认的定理呢？\par
+\noindent\hspace*{2em}多年以来，数学家们为证明四色定理绞尽脑汁，所引进的概念与方法刺激了拓扑学与图论的发展。在四色问题研究中，不少新的数学理论和数学计算技巧随之产生，例如将地图的着色问题转化为图论问题，丰富了图论的内容。不仅如此，"四色问题"在有效设计航空班机日程表、设计计算机的编码程序上都起到了推动作用。\par
+\noindent\hspace*{2em}中华人民共和国有 34 个省级行政区，含 23 个省、5 个自治区、4 个直辖市、2 个特别行政区\footnote{中国行政区划（2020 年），行政区划网。}。\par
+\begin{center}
+\includegraphics[width=0.65\textwidth]{images/exp2-1.png}
+\end{center}
+\noindent\hspace*{2em}23 个省分别为：河北省、山西省、辽宁省、吉林省、黑龙江省、江苏省、浙江省、安徽省、福建省、江西省、山东省、河南省、湖北省、湖南省、广东省、海南省、四川省、贵州省、云南省、陕西省、甘肃省、青海省、台湾省。\par
+\noindent\hspace*{2em}5 个自治区分别为：内蒙古自治区、广西壮族自治区、西藏自治区、宁夏回族自治区、新疆维吾尔自治区。\par
+\noindent\hspace*{2em}4 个直辖市分别为：北京市、天津市、上海市、重庆市。\par
+\noindent\hspace*{2em}2 个特别行政区分别为：香港特别行政区、澳门特别行政区。本问题的任务是：编写程序，用四种颜色对中国地图染色，输出任意一种染色方案。\par
+\noindent\hspace*{2em}是否能用 3 种颜色对中国地图染色？请编程验证。假设如下：\par
+\noindent\hspace*{2em}\textbf{四种颜色不限，输出形式不限}\par
+\noindent\hspace*{2em}\textbf{用递归和非递归两种算法来实现}\par
+\sect{基本思路}
+\noindent\hspace*{2em}地图可用图的邻接矩阵方法来存储。染色过程可借助一个栈结构，由于省级行政区数已知为 34，因此可使用顺序栈。\par
+\noindent\hspace*{2em}算法步骤（以递归版本为例）：\par
+\noindent\hspace*{2em}Step1：对区域下标 $i$ 从 0 开始依次尝试。\par
+\noindent\hspace*{2em}Step2：依次试探四种颜色 1、2、3、4，只要与所有已着色邻居不冲突即可着上。\par
+\noindent\hspace*{2em}Step3：若当前区域 1\~{}4 号色均冲突，则回溯到上一区域重新选择颜色。\par
+\noindent\hspace*{2em}Step4：若所有区域都被成功着色，则得到一个合法方案；否则无解。\par
+\noindent\hspace*{2em}非递归版本使用顺序栈保存"当前正在尝试着色的区域下标"以及"该区域下一个待试探的颜色"，遇冲突时通过出栈实现回溯。\par
+\noindent\hspace*{2em}染色时不妨总是从 1 号色开始试探。\par
+\sect{实验结果及分析}
+\noindent\hspace*{2em}1. 实验结果\par
+\noindent\hspace*{2em}（1）实验过程描述\par
+\noindent\hspace*{2em}1. 本实验用 Rust 语言开发，使用 Cargo 构建系统和 rustc 编译器，运行机器为本人笔记本电脑（macOS，Apple Silicon）。本人独立完成编码和测试，参考相关算法资料关于递归回溯的描述确定了方案。\par
+\noindent\hspace*{2em}2. 测试数据选取思路为：典型、覆盖边界情况、覆盖算法变体。共选取 3 组数据进行测试：(a) 34 省级行政区完整邻接矩阵的中国地图，验证 4 着色可行性；(b) 构造的 K4 完全图（4 个节点两两相邻），验证 4 色必要性；(c) 3 着色尝试，验证中国地图不能用 3 种颜色着色。\par
+\noindent\hspace*{2em}3. 4 染色回溯和 3 染色可行性验证的逻辑是测试重点。因为 4 染色和 3 染色共用同一回溯框架，区别仅在试探的颜色数。\par
+\noindent\hspace*{2em}（2）测试结果\par
+\noindent\hspace*{2em}运行实验程序对中国地图进行 4 染色和 3 染色尝试，结果如下表：\par
+\begin{center}
+\fontsize{9pt}{12pt}\selectfont
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|c|c|c|c|}
+\hline
+测试项 & 输入 & 输出 & 结论 \\ \hline
+递归 4 着色 & 中国 34 行政区 & 合法方案（34 项） & 成功 \\ \hline
+非递归 4 着色 & 中国 34 行政区 & 合法方案（34 项） & 成功 \\ \hline
+3 着色 & 中国 34 行政区 & 无解 & 不可行 \\ \hline
+\end{tabular}
+\end{center}
+\noindent\hspace*{2em}两种算法均得到一个合法方案（颜色取值仅为 1\~{}4），3 着色搜索失败——证明中国地图不能用 3 种颜色染色。递归与非递归 4 着色方案如下：\par
+\begin{center}
+\fontsize{8.5pt}{11pt}\selectfont
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|c|c|c||c|c|c|}
+\hline
+\textbf{行政区} & \textbf{递归色号} & \textbf{非递归色号} & \textbf{行政区} & \textbf{递归色号} & \textbf{非递归色号} \\ \hline
+北京   & 1 & 1 & 湖北   & 3 & 3 \\ \hline
+天津   & 2 & 2 & 湖南   & 1 & 1 \\ \hline
+河北   & 3 & 3 & 广东   & 3 & 3 \\ \hline
+山西   & 1 & 1 & 广西   & 2 & 2 \\ \hline
+内蒙古 & 2 & 2 & 海南   & 1 & 1 \\ \hline
+辽宁   & 1 & 1 & 重庆   & 2 & 2 \\ \hline
+吉林   & 3 & 3 & 四川   & 1 & 1 \\ \hline
+黑龙江 & 1 & 1 & 贵州   & 3 & 3 \\ \hline
+上海   & 1 & 1 & 云南   & 4 & 4 \\ \hline
+江苏   & 2 & 2 & 西藏   & 2 & 2 \\ \hline
+浙江   & 3 & 3 & 陕西   & 4 & 4 \\ \hline
+安徽   & 1 & 1 & 甘肃   & 3 & 3 \\ \hline
+福建   & 1 & 1 & 青海   & 4 & 4 \\ \hline
+江西   & 2 & 2 & 宁夏   & 1 & 1 \\ \hline
+山东   & 4 & 4 & 新疆   & 1 & 1 \\ \hline
+河南   & 2 & 2 & 台湾   & 1 & 1 \\ \hline
+ &   &   & 香港   & 1 & 1 \\ \hline
+ &   &   & 澳门   & 1 & 1 \\ \hline
+\end{tabular}
+\end{center}
+\noindent\hspace*{2em}对得到的 4 着色方案进行合法性校验（检查任意一对有共同边界的省份是否异色）以及颜色取值范围校验（仅取 1\~{}4），均通过。3 着色在递归版本上搜索完所有可能后返回无解，非递归版本同样返回 None。\par
+\noindent\hspace*{2em}将 4 染色方案以区域编号（0\~{}33）为横轴、颜色号为纵轴绘制分组柱状图：\par
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    width=0.98\textwidth,
+    height=5.8cm,
+    ymin=0, ymax=4.5,
+    ytick={1,2,3,4},
+    ylabel={颜色号},
+    xlabel={区域编号},
+    symbolic x coords={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33},
+    xtick={0,5,10,15,20,25,30,33},
+    bar width=2.2pt,
+    enlarge x limits=0.04,
+    grid=major,
+    legend pos=outer north east,
+    legend style={font=\fontsize{8pt}{10pt}\selectfont},
+]
+\addplot[fill=blue!60] coordinates {
+    (0,1)(1,2)(2,3)(3,1)(4,2)(5,1)(6,3)(7,1)(8,1)(9,2)(10,3)(11,1)(12,1)(13,2)(14,4)(15,2)(16,3)(17,1)(18,3)(19,2)(20,1)(21,2)(22,1)(23,3)(24,4)(25,2)(26,4)(27,3)(28,4)(29,1)(30,1)(31,1)(32,1)(33,1)
+};
+\addlegendentry{递归 4 着色}
+\addplot[fill=red!60] coordinates {
+    (0,1)(1,2)(2,3)(3,1)(4,2)(5,1)(6,3)(7,1)(8,1)(9,2)(10,3)(11,1)(12,1)(13,2)(14,4)(15,2)(16,3)(17,1)(18,3)(19,2)(20,1)(21,2)(22,1)(23,3)(24,4)(25,2)(26,4)(27,3)(28,4)(29,1)(30,1)(31,1)(32,1)(33,1)
+};
+\addlegendentry{非递归 4 着色}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\noindent\hspace*{2em}从分组柱状图可见，两种算法在 34 个区域上得到完全相同的着色方案（蓝红两柱等高并列），所有区域颜色号均落在 1\~{}4 之间。下表统计了各颜色被使用的次数：\par
+\begin{center}
+\fontsize{9pt}{12pt}\selectfont
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{颜色号} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} \\ \hline
+使用区域数 & 15 & 8 & 7 & 4 \\ \hline
+\end{tabular}
+\end{center}
+\noindent\hspace*{2em}由统计可见，1 号色被使用 15 次最多，2 号色 8 次次之，4 号色仅 4 次最少。这是因为递归/非递归算法均采用固定下标顺序（0\~{}33）依次试探，从 1 号色起着色，故位于"着色序列前段"的区域有更多机会取到 1 号色。\par
+\noindent\hspace*{2em}2. 结果及方案分析\par
+\noindent\hspace*{2em}（1）本实验的重点及难点\par
+\noindent\hspace*{2em}核心工作是建立 34$\times$34 邻接矩阵描述 34 个省级行政区的相邻关系，按编号顺序依次试探颜色，冲突时回溯到上一区域。\par
+\noindent\hspace*{2em}非递归改写中需要用顺序栈显式保存"待回溯的中间状态"——栈中记录"当前区域下标"和"下一个待试探的颜色号"，冲突时出栈实现状态回退。\par
+\noindent\hspace*{2em}（2）本实验设计的优点及可以改进的方向\par
+\noindent\hspace*{2em}程序支持 4 染色和 3 染色验证。(1) 邻接矩阵与区域名称集中存储在常量数组中；(2) 递归与非递归共用 is\_safe 检测函数；(3) 单元测试覆盖 K4 完全图与零边图；(4) 非递归版本显式使用顺序栈。\par
+\noindent\hspace*{2em}设计的可优化处包括：(1) 当前按固定下标顺序着色，回溯次数可能较多，可改用 Welsh-Powell 等启发式策略按度数从大到小选择下一个区域着色，平均搜索量更小；(2) 邻接矩阵存储为 34$\times$34=1156 字节，对中国地图规模可以接受，但若推广到更细粒度的县级行政区，可改用邻接表节省空间；(3) 非递归版本代码较为冗长，栈操作和回溯控制逻辑可以进一步抽象。\par
+\noindent\hspace*{2em}3. 从四色定理看科学研究方法。\par
+\noindent\hspace*{2em}四色猜想从 1852 年提出到 1976 年 Appel 和 Haken 用计算机验证约 1936 个构型完成证明，历时 124 年。计算机辅助证明已成为数学研究的新范式。四色理论已用于 PCB 布线、航班排程和无线频率分配。\par
+\noindent\hspace*{2em}作为计算机专业的学生，应重视算法理论基础，也关注工程落地——如图着色之于排课系统。面对复杂问题时，可借助工具处理繁琐环节，将精力集中在创造性思路上。\par
+\noindent\hspace*{2em}4. 附件：源程序代码\par
+\noindent\hspace*{2em}4. 附件：源程序代码\par
+\noindent\hspace*{2em}实验代码使用 Rust 语言编写，Cargo 构建。整个工程分为三个源文件：lib.rs 负责核心算法，stack.rs 负责顺序栈抽象，main.rs 负责命令行入口。\par
+{
+\fontsize{7.5pt}{10pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.6cm}
+\begin{multicols}{2}
+\noindent\textbf{src/lib.rs}\par
+
+\begin{verbatim}
+pub mod region;
+pub mod stack;
+
+use crate::region::{adjacency, N};
+
+/// 检查颜色 color[idx] = c 是否与所有
+/// 已着色的邻居冲突
+fn is_safe(map: &[[u8; N]; N],
+           color: &[u8; N],
+           idx: usize, c: u8) -> bool {
+    for j in 0..N {
+        if map[idx][j] == 1
+           && color[j] != 0
+           && color[j] == c {
+            return false;
+        }
+    }
+    true
+}
+
+/// 递归回溯求解 n-着色问题
+pub fn color_recursive(
+        map: &[[u8; N]; N],
+        n_colors: u8
+    ) -> Option<[u8; N]> {
+    let mut color = [0u8; N];
+
+    if try_color(map, &mut color, 0,
+                 n_colors) {
+        Some(color)
+    } else {
+        None
+    }
+}
+
+fn try_color(map: &[[u8; N]; N],
+             color: &mut [u8; N],
+             idx: usize,
+             n_colors: u8) -> bool {
+    if idx == N {
+        return true;
+    }
+
+    for c in 1..=n_colors {
+        if is_safe(map, color, idx, c) {
+            color[idx] = c;
+            if try_color(map, color,
+                         idx + 1,
+                         n_colors) {
+                return true;
+            }
+            color[idx] = 0;
+        }
+    }
+
+    false
+}
+
+/// 非递归回溯：借助顺序栈保存
+/// 当前正在处理的区域下标
+pub fn color_non_recursive(
+        map: &[[u8; N]; N],
+        n_colors: u8
+    ) -> Option<[u8; N]> {
+    let mut color = [0u8; N];
+    let mut st =
+        stack::Stack::new(N + 1);
+
+    let mut idx: usize = 0;
+    loop {
+        // 找一个尚未着色的区域
+        while idx < N
+              && color[idx] != 0 {
+            idx += 1;
+        }
+
+        if idx == N {
+            return Some(color);
+        }
+
+        // 从 color[idx]+1 开始尝试
+        let mut c = color[idx] + 1;
+        let mut found = false;
+
+        while c <= n_colors {
+            if is_safe(map, &color,
+                       idx, c) {
+                found = true;
+                break;
+            }
+            c += 1;
+        }
+
+        if found {
+            color[idx] = c;
+            st.push(idx);
+            idx += 1;
+        } else {
+            // 回溯
+            color[idx] = 0;
+
+            let mut bt_ok = false;
+            while let Some(prev) = st.pop() {
+                let prev_color = color[prev];
+                color[prev] = 0;
+                let mut nc = prev_color + 1;
+                let mut ok = false;
+                while nc <= n_colors {
+                    if is_safe(map, &color,
+                               prev, nc) {
+                        ok = true;
+                        break;
+                    }
+                    nc += 1;
+                }
+
+                if ok {
+                    color[prev] = nc;
+                    st.push(prev);
+                    idx = prev + 1;
+                    bt_ok = true;
+                    break;
+                }
+            }
+
+            if !bt_ok {
+                return None;
+            }
+        }
+    }
+}
+
+/// 验证一个 n-着色方案是否合法
+pub fn is_valid_coloring(
+        map: &[[u8; N]; N],
+        color: &[u8; N]) -> bool {
+    for i in 0..N {
+        for j in (i + 1)..N {
+            if map[i][j] == 1
+               && color[i] == color[j] {
+                return false;
+            }
+        }
+    }
+    true
+}
+
+pub fn default_map() -> [[u8; N]; N] {
+    adjacency()
+}
+
+pub use region::region_name;
+\end{verbatim}
+
+\columnbreak
+
+\noindent\textbf{src/stack.rs}\par
+
+\begin{verbatim}
+/// 顺序栈，存储当前正在尝试
+/// 着色的区域下标
+pub struct Stack {
+    data: Vec<usize>,
+    top: usize,
+}
+
+impl Stack {
+    pub fn new(capacity: usize)
+        -> Self {
+        Stack {
+            data: vec![0; capacity],
+            top: 0,
+        }
+    }
+
+    pub fn push(&mut self,
+                val: usize) -> bool {
+        if self.top >= self.data.len() {
+            return false;
+        }
+        self.data[self.top] = val;
+        self.top += 1;
+        true
+    }
+
+    pub fn pop(&mut self)
+        -> Option<usize> {
+        if self.top == 0 {
+            return None;
+        }
+        self.top -= 1;
+        Some(self.data[self.top])
+    }
+
+    pub fn peek(&self)
+        -> Option<usize> {
+        if self.top == 0 {
+            None
+        } else {
+            Some(self.data[
+                self.top - 1])
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.top == 0
+    }
+
+    pub fn len(&self) -> usize {
+        self.top
+    }
+}
+\end{verbatim}
+
+\noindent\textbf{src/region.rs}\par
+
+\begin{verbatim}
+pub const REGIONS: [&str; 34] = [
+    "北京", "天津", "河北", "山西",
+    "内蒙古",
+    "辽宁", "吉林", "黑龙江",
+    "上海", "江苏", "浙江", "安徽",
+    "福建", "江西", "山东",
+    "河南", "湖北", "湖南", "广东",
+    "广西", "海南",
+    "重庆", "四川", "贵州", "云南",
+    "西藏",
+    "陕西", "甘肃", "青海", "宁夏",
+    "新疆",
+    "台湾", "香港", "澳门",
+];
+
+pub const N: usize = 34;
+
+pub fn adjacency() -> [[u8; N]; N] {
+    let mut m = [[0u8; N]; N];
+    // 共 70 条无向边，省略具体列表
+    // ...
+    m
+}
+
+pub fn region_name(idx: usize)
+    -> &'static str {
+    REGIONS[idx]
+}
+\end{verbatim}
+
+\noindent\textbf{src/main.rs}\par
+
+\begin{verbatim}
+use exp_2::{
+    color_non_recursive,
+    color_recursive,
+    default_map,
+    is_valid_coloring,
+    region_name
+};
+
+fn print_coloring(
+        label: &str,
+        color: &[u8; 34]) {
+    println!("\n=== {} ===", label);
+    for i in 0..34 {
+        println!(
+            "  {:>4} -> 色 {}",
+            region_name(i),
+            color[i]
+        );
+    }
+}
+
+fn main() {
+    let map = default_map();
+
+    // 递归 4 着色
+    if let Some(c) =
+        color_recursive(&map, 4) {
+        assert!(
+            is_valid_coloring(&map, &c));
+        print_coloring(
+            "递归 4 着色方案", &c);
+    }
+
+    // 非递归 4 着色
+    if let Some(c) =
+        color_non_recursive(&map, 4) {
+        assert!(
+            is_valid_coloring(&map, &c));
+        print_coloring(
+            "非递归 4 着色方案", &c);
+    }
+
+    // 3 着色可行性验证
+    let three =
+        color_recursive(&map, 3);
+    match three {
+        Some(_) => println!(
+            "3 着色：存在合法方案"),
+        None => println!(
+            "3 着色：无合法方案"),
+    }
+}
+\end{verbatim}
+
+\end{multicols}
+}
+\vspace{0.5cm}
+{
+\fontsize{7.5pt}{10pt}\selectfont
+\setlength{\parindent}{0pt}
+\setlength{\columnsep}{0.6cm}
+\begin{multicols}{2}
+\noindent\textbf{tests/test\_fn.rs}\par
+
+\begin{verbatim}
+use exp_2::{
+    color_non_recursive,
+    color_recursive,
+    default_map,
+    is_valid_coloring,
+    region_name
+};
+
+fn k4_map() -> [[u8; 34]; 34] {
+    let mut m = [[0u8; 34]; 34];
+    let nodes = [0, 1, 2, 3];
+    for &i in &nodes {
+        for &j in &nodes {
+            if i != j {
+                m[i][j] = 1;
+            }
+        }
+    }
+    m
+}
+
+fn empty_map() -> [[u8; 34]; 34] {
+    [[0u8; 34]; 34]
+}
+
+#[test]
+fn recursive_4color_finds() {
+    let map = default_map();
+    let c = color_recursive(
+        &map, 4
+    ).expect("应可解");
+    assert!(
+        is_valid_coloring(&map, &c));
+    for i in 0..34 {
+        assert!((1..=4)
+            .contains(&c[i]));
+    }
+}
+
+#[test]
+fn non_recursive_matches() {
+    let map = default_map();
+    let c1 = color_recursive(
+        &map, 4).unwrap();
+    let c2 = color_non_recursive(
+        &map, 4).unwrap();
+    assert!(
+        is_valid_coloring(&map, &c1));
+    assert!(
+        is_valid_coloring(&map, &c2));
+}
+
+#[test]
+fn three_color_should_fail() {
+    let map = default_map();
+    assert!(color_recursive(
+        &map, 3).is_none());
+    assert!(color_non_recursive(
+        &map, 3).is_none());
+}
+
+#[test]
+fn k4_needs_four() {
+    let map = k4_map();
+    assert!(color_recursive(
+        &map, 3).is_none());
+    let c = color_recursive(
+        &map, 4).unwrap();
+    assert!(
+        is_valid_coloring(&map, &c));
+}
+
+#[test]
+fn empty_map_one_color() {
+    let map = empty_map();
+    let c = color_recursive(
+        &map, 1).unwrap();
+    for v in c.iter() {
+        assert_eq!(*v, 1);
+    }
+    assert!(
+        is_valid_coloring(&map, &c));
+}
+
+#[test]
+fn region_names_count() {
+    let map = default_map();
+    let c = color_recursive(
+        &map, 4).unwrap();
+    for i in 0..34 {
+        assert!(
+            !region_name(i).is_empty());
+        assert!(c[i] >= 1);
+    }
+}
+
+#[test]
+fn non_border_pairs() {
+    let map = default_map();
+    let pairs = [
+        (1,14), (3,14), (4,30),
+        (12,31), (18,20), (19,20),
+    ];
+    for &(i, j) in pairs.iter() {
+        assert_eq!(map[i][j], 0);
+        assert_eq!(map[j][i], 0);
+    }
+}
+\end{verbatim}
+
+\end{multicols}
+}
+{
+\fontsize{7.5pt}{10pt}\selectfont
+\setlength{\parindent}{0pt}
+\noindent\textbf{测试用例}\par
+\noindent (a) 中国地图 34 行政区完整邻接矩阵：递归/非递归 4 着色均成功，3 着色无解。\par
+\noindent (b) K4 完全图（4 节点两两相邻）：4 着色成功，3 着色无解。\par
+\noindent (c) 零边图：1 着色即可（全部着 1 号色），无冲突。\par
+\noindent (d) 非共同边界检查：天津-山东、山西-山东、内蒙古-新疆、福建-台湾、广东-海南、广西-海南均不记为相邻。\par
+}
+
