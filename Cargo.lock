@@ -223,3 +223,19 @@ version = "0.1.0"
 [[package]]
 name = "exp_7_ex_5"
 version = "0.1.0"
+
+[[package]]
+name = "exp_8_ex_1"
+version = "0.1.0"
+
+[[package]]
+name = "exp_8_ex_2"
+version = "0.1.0"
+
+[[package]]
+name = "exp_8_ex_3"
+version = "0.1.0"
+
+[[package]]
+name = "exp_8_ex_4"
+version = "0.1.0"

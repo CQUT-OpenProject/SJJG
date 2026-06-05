@@ -51,6 +51,10 @@ members = [
     "EXP/EXP_7/ex_3",
     "EXP/EXP_7/ex_4",
     "EXP/EXP_7/ex_5",
+    "EXP/EXP_8/ex_1",
+    "EXP/EXP_8/ex_2",
+    "EXP/EXP_8/ex_3",
+    "EXP/EXP_8/ex_4",
 ]
 resolver = "2"
 
